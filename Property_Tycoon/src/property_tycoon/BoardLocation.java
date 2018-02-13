@@ -16,7 +16,7 @@ public class BoardLocation {
     String action;
     boolean canBuy;
     
-    public void BoardLocation(int position, String name, int value, String colour, String action, boolean canBuy){
+    public BoardLocation(int position, String name, int value, String colour, String action, boolean canBuy){
         this.position = position;
         this.name = name;
         this.value = value;
@@ -26,7 +26,7 @@ public class BoardLocation {
     }
     
     public String getInformation(){
-        String info = ("Position: " + Integer.toString(position) + "./nName: " + name + "./nValue: " + Integer.toString(value) + "./nColour: " + colour);
+        String info = ("Position: " + Integer.toString(position) + ".\nName: " + name + ".\nValue: " + Integer.toString(value) + ".\nColour: " + colour +"\n");
         return info;
     }
 }
