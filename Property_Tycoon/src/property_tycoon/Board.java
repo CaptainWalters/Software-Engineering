@@ -14,19 +14,19 @@ import java.util.List;
  */
 public class Board {
 
-    BoardLocation[] loc;
+    BoardLocation[] board;
     
     public Board(){
-        loc = new BoardLocation[40];
+        board = new BoardLocation[40];
     }
   
     public String getInfo (int position){
-        return loc[position].getInformation();
+        return board[position].getInformation();
     }
     
     public void populateBoard() throws IOException{   
-        loc[0] = new BoardLocation(0,"Go",0, "", "Collect $200", false);
-        loc[1] = new BoardLocation(1,"Crapper Street",60,"Brown","", true);
-        loc[2] = new BoardLocation(2,"Pot Luck",0,"","Pick pot luck card", false);
+        board[0] = new BoardLocation(0,"Go",0, "", "Collect $200", false);
+        board[1] = new BoardLocation(1,"Crapper Street",60,"Brown","", true);
+        board[2] = new BoardLocation(2,"Pot Luck",0,"","Pick pot luck card", false);
     }
 }

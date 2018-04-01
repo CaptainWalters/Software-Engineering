@@ -6,17 +6,19 @@ import java.io.IOException;
  *
  * @author Kieran
  */
-public class Property_Tycoon {
+public interface Property_Tycoon {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws IOException {
-        Board test = new Board();
-        test.populateBoard();
-        System.out.println(test.getInfo(0));
-        System.out.println(test.getInfo(1));
-        System.out.println(test.getInfo(2));
-    }
+    public Board initBoard();
     
+    public Player[] initPlayers();
+    
+    public CPU[] initCPU();
+    
+    public Banker initBanker();
+    
+    public Dice initDice();
+    
+    public PotLuck[] initPotLuck();
+    
+    public OpportunityKnocks[] initOpertunityKnocks();
 }

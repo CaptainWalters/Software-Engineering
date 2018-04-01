@@ -36,4 +36,32 @@ public class Player {
             position -= 40;
         }
     }
+    
+    public int getPosition(){
+        return position;
+    }
+    
+    public int getMoney(){
+        return money;
+    }
+    
+    public String getPlayerName(){
+        return playerName;
+    }
+    
+    public int getPlayerNumber(){
+        return playerNo;
+    }
+    
+    public String getPlayerToken(){
+        return token;
+    }
+    
+    public boolean isBanker(){
+        return banker;
+    }
+    
+    public boolean isCPU(){
+        return cpu;
+    }
 }
