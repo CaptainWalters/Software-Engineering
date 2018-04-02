@@ -10,7 +10,7 @@ public interface Property_Tycoon {
 
     public Board initBoard();
     
-    public Player[] initPlayers();
+    public Player[] initPlayers(int noOfPlayers);
     
     public CPU[] initCPU();
     

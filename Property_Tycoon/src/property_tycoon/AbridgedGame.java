@@ -4,12 +4,14 @@ package property_tycoon;
  *
  * @author Kieran
  */
-public class ClassicGame implements Property_Tycoon {
+public class AbridgedGame implements Property_Tycoon {
 
-    ClassicGame(int humanPlayers, int CPUPlayers) {
-        System.out.println("ClassicGame made");
+    AbridgedGame(int humanPlayers, int CPUPlayers) {
+        System.out.println("AbridgedGame made");
     }
-
+    
+    
+    
     @Override
     public Board initBoard() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -17,8 +19,7 @@ public class ClassicGame implements Property_Tycoon {
 
     @Override
     public Player[] initPlayers(int noOfPlayers) {
-        Player[] players = new Player[noOfPlayers];
-        return players;
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
