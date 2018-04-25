@@ -19,4 +19,10 @@ public interface PropertyTycoon {
     public PotLuck[] initPotLuck();
 
     public OpportunityKnocks[] initOpertunityKnocks();
+
+    public void update();
+
+    public void movePlayer();
+
+
 }

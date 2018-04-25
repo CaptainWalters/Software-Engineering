@@ -1,3 +1,5 @@
+import javax.swing.*;
+
 /**
  *
  * @author Kieran
@@ -6,6 +8,15 @@ public class ClassicGame implements PropertyTycoon {
 
     ClassicGame(int humanPlayers, int CPUPlayers) {
         System.out.println("ClassicGame made");
+    }
+    int noOfPlayers = Integer.parseInt(JOptionPane.showInputDialog(null, "Does this work?"));
+
+
+
+
+    public void init(){
+        Board playBoard = new Board();
+
     }
 
     @Override
@@ -42,6 +53,16 @@ public class ClassicGame implements PropertyTycoon {
     @Override
     public OpportunityKnocks[] initOpertunityKnocks() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void update() {
+
+    }
+
+    @Override
+    public void movePlayer() {
+
     }
 
 }

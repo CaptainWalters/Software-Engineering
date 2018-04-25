@@ -83,7 +83,7 @@ public class GUI extends JFrame {
     //    private ArrayList<Boot> Boot;
 
 
-    private GUI() {
+    public GUI() {
         // Load assets HERE
         this.Window = new JPanel();
         this.GOTextField = new JTextField("GO");
@@ -113,13 +113,41 @@ public class GUI extends JFrame {
     }
 
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         // Don't touch (main run)
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 createAndShowGui();
             }
         });
-    }
+    }*/
+
+
+//    public void init(){
+//
+//        int totalPlayers = 0;
+//
+//        String[] options = new String[] {"Classic", "Abridged"};
+//        int gameType = JOptionPane.showOptionDialog(null, "Please choose a game type", "Game selection",
+//                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+//                null, options, options[0]);
+//
+//
+//        while((totalPlayers == 0)||(totalPlayers<=6)){
+//            int noOfPlayers = Integer.parseInt(JOptionPane.showInputDialog(null, "Enter the number of human players. Total players = 6 (human + cpu)"));
+//            totalPlayers += noOfPlayers;
+//            int noOfCPU = Integer.parseInt(JOptionPane.showInputDialog(null, "Enter the number of CPU players. Total players = 6 (human + cpu)"));
+//            totalPlayers += noOfCPU;
+//        }
+//
+//        if(gameType.equals("Classic")){
+//            ClassicGame game = new ClassicGame(humanPlayers, CPUPlayers);
+//            game.initPlayers(humanPlayers);
+//        } else if(gameType.equals("Abridged")){
+//            AbridgedGame game = new AbridgedGame(humanPlayers, CPUPlayers);
+//        }
+//    }
+
+
 
 }

@@ -45,4 +45,14 @@ public class AbridgedGame implements PropertyTycoon {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
+    public void update() {
+
+    }
+
+    @Override
+    public void movePlayer() {
+
+    }
+
 }
