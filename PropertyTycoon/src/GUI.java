@@ -1,8 +1,18 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/**
+ *
+ * @author sezuka
+ */
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class GUI extends Frame{
+public class GUI extends JFrame {
     private JTextField CrapperStreetName;
     private JTextField GOTextField;
     private JPanel Window;
@@ -65,22 +75,51 @@ public class GUI extends Frame{
     private JPanel CrapperStreetGoblet;
     private JPanel EdisonWater;
 
-//    private ArrayList<SmartPhone> SmartPhone;
-//    private ArrayList<Goblet> Goblet;
-//    private ArrayList<Cat> Cat;
-//    private ArrayList<HatStand> HatStand;
-//    private ArrayList<Spoon> Spoon;
-//    private ArrayList<Boot> Boot;
+    //    private ArrayList<SmartPhone> SmartPhone;
+    //    private ArrayList<Goblet> Goblet;
+    //    private ArrayList<Cat> Cat;
+    //    private ArrayList<HatStand> HatStand;
+    //    private ArrayList<Spoon> Spoon;
+    //    private ArrayList<Boot> Boot;
 
 
-    public static void main(String[] args) {
+    private GUI() {
+        // Load assets HERE
+        this.Window = new JPanel();
+        this.GOTextField = new JTextField("GO");
+
+        // Leave this (adds components to main panel automatically)
+        //for (JComponent comp : allComponents) {
+        Window.add(GOTextField);
+        //}
+    }
+
+    public JComponent getMainComponent() {
+        return Window;
+    }
+
+    private static void createAndShowGui() {
+        GUI gameFrame = new GUI();
+
+        // creating my JFrame only when I need it and where I need it
         JFrame frame = new JFrame("Property Tycoon");
-        frame.setContentPane(new GUI().Window);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setSize(1000,1000);
+        frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+        frame.getContentPane().add( gameFrame.getMainComponent() );
+        frame.setSize(1000, 1000);
+        frame.setLocationRelativeTo(null);
+        //frame.pack();
+        frame.setLocationByPlatform(true);
         frame.setVisible(true);
     }
 
+
+    public static void main(String[] args) {
+        // Don't touch (main run)
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                createAndShowGui();
+            }
+        });
+    }
 
 }
