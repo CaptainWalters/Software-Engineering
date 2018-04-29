@@ -26,11 +26,12 @@ public class ClassicGame{
     Dice dice1;
     Dice dice2;
     Board board;
+
+    int freeParking = 0;
+
     PotLuck potLuck;
-
-
-
     OpportunityKnocks opportunityKnocks;
+
     Boolean gameFinished = false;
 
     int currentTurn = 0;
