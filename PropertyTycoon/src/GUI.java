@@ -98,7 +98,7 @@ public class GUI extends JFrame {
         return Window;
     }
 
-    private static void createAndShowGui() {
+    public static void createAndShowGui() {
         GUI gameFrame = new GUI();
 
         // creating my JFrame only when I need it and where I need it

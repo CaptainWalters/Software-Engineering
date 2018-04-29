@@ -11,7 +11,6 @@ import java.util.Scanner;
 public class GameMain {
 
 
-
     public static void main(String[] args){
         int totalPlayers = 0;
         int humanPlayers = 0;
@@ -45,5 +44,4 @@ public class GameMain {
         f.getContentPane().add(standardPanel);
         JTextField p1 = new JTextField();
     }
-
-    }
+}

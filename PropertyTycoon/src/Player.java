@@ -1,3 +1,5 @@
+import java.util.Stack;
+
 /**
  *
  * @author 132206
@@ -12,6 +14,7 @@ public class Player {
     String token;
     boolean banker;
     boolean cpu;
+    Stack<Card> heldCards;
 
     int position;
 
@@ -35,6 +38,7 @@ public class Player {
         }
     }
 
+    //Getters & Setters
     public int getPosition(){
         return position;
     }
@@ -62,4 +66,65 @@ public class Player {
     public boolean isCPU(){
         return cpu;
     }
+    //Getters & Setters End
+
+    private void addMoney(int i) {
+        money += i;
+    }
+    private void payMoney(int i) {
+        money -= i;
+    }
+
+    public Card drawCard(Deck deck){
+        Card card;
+        String action;
+
+        card = deck.getNextCard();
+        action = card.getAction();
+
+        if(action.equals("keep")) {
+            heldCards.push(card);
+            return null;
+        } else {
+            return card;
+        }
+    }
+
+    public void doAction(String action, String value) throws Exception {
+        switch(action) {
+            case "get":
+                addMoney(Integer.parseInt(value));
+                break;
+            case "pay":
+                payMoney(Integer.parseInt(value));
+                break;
+            case "jump":
+                moveToPosition(Integer.parseInt(value));
+                break;
+            case "select":
+                //addMoney(Integer.parseInt(value));
+                break;
+            case "free":
+                addMoney(Integer.parseInt(value));
+                break;
+            case "collect":
+                addMoney(Integer.parseInt(value));
+                break;
+            case "keep":
+                addMoney(Integer.parseInt(value));
+                break;
+            case "move":
+                addMoney(Integer.parseInt(value));
+                break;
+            case "repair":
+                addMoney(Integer.parseInt(value));
+                break;
+            case "jail":
+                addMoney(Integer.parseInt(value));
+                break;
+            default:
+                throw new Exception("NO ACTION!");
+        }
+    }
+
 }
