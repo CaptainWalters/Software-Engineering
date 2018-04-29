@@ -1,6 +1,6 @@
 /**
  *
- * @author 132206
+ * @author Kieran(132206)
  *
  */
 
@@ -9,20 +9,20 @@ public class Player {
     int money;
     int playerNo;
     String playerName;
-    String token;
-    boolean banker;
+    Enum token;
     boolean cpu;
-
+    boolean passedGo;
     int position;
 
-    public void Player(int playerNo, String playerName, String token, boolean banker, boolean cpu){
+
+    public Player(int playerNo, String playerName, Enum token, boolean cpu){
         this.playerNo = playerNo;
         this.playerName = playerName;
         this.token = token;
-        this.banker = banker;
         this.cpu = cpu;
         money = 1500;
         position = 0;
+        passedGo = true;
     }
 
     // This method calculates the players "position" and if they go round the board
@@ -30,9 +30,14 @@ public class Player {
     public void movePosition(int noOfSpaces){
         position += noOfSpaces;
         if (position > 39) {
-            //passed go
-            position -= 40;
+            passedGo = true;
+            passedGo();
+            position = position % 40;
         }
+    }
+
+    private void passedGo() {
+        money+=200;
     }
 
     public int getPosition(){
@@ -51,15 +56,20 @@ public class Player {
         return playerNo;
     }
 
-    public String getPlayerToken(){
+    public Enum getPlayerToken(){
         return token;
     }
 
-    public boolean isBanker(){
-        return banker;
-    }
 
     public boolean isCPU(){
         return cpu;
+    }
+
+    public void moveToPosition(int position) {
+        this.position = position;
+    }
+
+    public void pay(int value){
+        money-= value;
     }
 }

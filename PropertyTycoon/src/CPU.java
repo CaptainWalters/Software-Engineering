@@ -1,7 +1,7 @@
 /**
  *
- * @author Kieran
+ * @author
  */
-class CPU {
+class CPU{
 
 }

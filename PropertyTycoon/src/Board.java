@@ -1,21 +1,20 @@
 import java.io.IOException;
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import java.util.List;
 
 /**
  *
- * @author Kieran
+ * @author Kieran(132206)
+ *
  */
+
 public class Board {
 
-    // Kieran>>>
      BoardLocation[] board;
 
-     public Board(){
-         board = new BoardLocation[40];
+     public Board() throws IOException {
+         board = new BoardLocation[41];
+         populateBoard();
      }
 
      public String getInfo (int position){
@@ -33,7 +32,7 @@ public class Board {
          board[7] = new BoardLocation(7,"Opportunity Knocks", 0,"","Pick opportunity knocks card", false);
          board[8] = new BoardLocation(8,"Potts Avenue", 100,"blue","", true);
          board[9] = new BoardLocation(9,"Nardole Drive", 120,"blue","", true);
-         board[10] = new BoardLocation(10,"Jail/Just Visiting", 0,"","", false);
+         board[10] = new BoardLocation(10,"Just Visiting", 0,"","", false);
          board[11] = new BoardLocation(11,"Skywalker Drive", 140,"purple","", true);
          board[12] = new BoardLocation(12,"Tesla PowerCo", 150,"utilities","", true);
          board[13] = new BoardLocation(13,"Wookie Hole ", 140,"purple","", true);
@@ -63,96 +62,6 @@ public class Board {
          board[37] = new BoardLocation(37,"Hawking Way", 350,"deep blue","", true);
          board[38] = new BoardLocation(38,"Super Tax", 0,"","Pay £100", false);
          board[39] = new BoardLocation(39,"Turing Heights", 400,"deep blue","", true);
-
+         board[40] = new BoardLocation(99,"Jail", 0,"jail", "jail_actions", false);
      }
-
-    // Loz>>>>
-
-     // making an immutible list of locations
-//       private final List<Tile> gameBoard;
-//
-//      private Board(Builder builder){
-//          this.gameBoard = createGameBoard(builder);
-//      }
-//
-//      public TileLocation getLocation(int tileLocation){
-//          return gameBoard.get(tileLocation);
-//      }
-//
-//      private static List<Tile> createGameBoard(final Builder builder){
-//          final final Tile[] tiles = newTile[BoardUtils.NUM_TILES);
-//          for int i = 0; i < BoardUtils.NUMTILES; i++){
-//              tiles[i] = Tile.createTile(i, builder.boardConfig.get(i)); // create a tiler
-//          }
-//          return ImmutableList.copyOf(tiles);
-//
-//      }
-//
-//      public static Board createMonopolyBoard(){
-//      //will use the builder class in order to build the MonopolyBoard that we wish to be used.
-//          final Builder builder = new Builder();
-//          // makings of the new pieces and setting them to the Go Square
-//          builder.setPiece[new SmartPhone[Type.SmartPhone,0]];
-//          builder.setPiece[new Cat[Type.Cat,0]];
-//          builder.setPiece[new Goblet[Type.Goblet,0]];
-//          builder.setPiece[new Boot[Type.Boot,0]];
-//          builder.setPiece[new HatStand[Type.HatStand,0]];
-//          builder.setPiece[new Spoon[Type.Spoon,0]];
-//          //^ doesnt yet work not all set up need to make independant classes for all the piece.
-//
-//      }
-//
-//      public static class Builder{
-//        // creation of a builder in order ot build the board
-//      public Builder(){
-//      }
-//
-//      public Builder setPiece(final Piece piece) {
-//            this.boardConfig.put[piece.getpieceLocation[], piece);
-//            return this;
-//      }
-//
-//      public Builder setMoveMaker(final Type nextPlayerToMove) {
-//          this.nextPlayerToMove = nextPlayerToMove;
-//          return this;
-//      }
-//
-//      public Board build(){
-//          return new Board(this);
-//      }
-
-
-      /*
-      ** <<<<piece enum notes>>>>
-      **public abstract enum Piece{
-      **protected final int pieceLocation;
-      **protected final Alliance pieceType;
-      **protected final boolean isFirstMove;
-      **
-      **Piece(final int piecePosition, final Type pieceType){
-      **this.pieceType = pieceType;
-      **this.pieceLocation = pieceLocation;
-      ** ***MORE HERE***
-      ** this.isFirstMove = false;
-      ** }
-      **
-      ** public int getPieceLocation(){
-      **  return this.pieceLocation;
-      ** }
-      **
-      **public Type getPieceType(){
-      **return this.pieceAlliance;
-      **}
-      **
-      **public boolean isFirstMove(){
-      **  return this.isFirstMove;
-      **}
-      **
-      **public boolean isFirstLap(){
-      **  return this.isFirstLap;
-      **}
-      **
-      **public abstract Collection<Move> calculateLegalMoves(final Board board);
-      */
-
 }
