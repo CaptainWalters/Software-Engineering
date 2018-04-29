@@ -1,26 +1,32 @@
 import javax.swing.*;
+import java.awt.*;
 import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import static java.lang.System.in;
 import java.util.Scanner;
 
+
 /**
  *
- * @author Kieran
+ * @author Kieran(132206)
+ *
  */
 public class GameMain {
 
-
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException {
         int totalPlayers = 0;
         int humanPlayers = 0;
         int CPUPlayers = 0;
 
+
+        //choose game type
         String[] options = new String[] {"Classic", "Abridged"};
         int gameType = JOptionPane.showOptionDialog(null, "Please choose a game type", "Game selection",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
                 null, options, options[0]);
 
+        //choose how many players
         while((totalPlayers == 0)||(totalPlayers>6)){
             totalPlayers = 0;
             int noOfPlayers = Integer.parseInt(JOptionPane.showInputDialog(null, "Enter the number of human players. Total players = 6 (human + cpu)"));
@@ -31,9 +37,15 @@ public class GameMain {
             totalPlayers += noOfCPU;
         }
 
+
+
+
+
+
+
         if(gameType == 0){
-            ClassicGame game = new ClassicGame(humanPlayers, CPUPlayers);
-            game.initPlayers(humanPlayers);
+            ClassicGame game = new ClassicGame(totalPlayers);
+
         } else if(gameType == 1){
             AbridgedGame game = new AbridgedGame(humanPlayers, CPUPlayers);
         }

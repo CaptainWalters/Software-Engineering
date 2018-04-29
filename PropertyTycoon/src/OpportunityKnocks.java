@@ -1,6 +1,6 @@
 /**
  *
- * @author Kieran
+ * @author Oliver
  */
 class OpportunityKnocks {
 

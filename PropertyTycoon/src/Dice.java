@@ -1,7 +1,9 @@
 import java.util.Random;
 
 /**
- * @author 132206
+ *
+ * @author Kieran(132206)
+ *
  */
 
 public class Dice {

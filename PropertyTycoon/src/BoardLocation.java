@@ -1,18 +1,21 @@
 /**
  *
- * @author Kieran
+ * @author Kieran(132206)
+ *
  */
 public class BoardLocation {
 
     // this class is used to populate each board location and can hold players on the space, what the space is
     // and how much it costs etc.
-// Kieran>>>>>>
+
      int position;
      String name;
      int value;
      String colour;
      String action;
      boolean canBuy;
+     boolean isOwned;
+     Player owner;
 
      public BoardLocation(int position, String name, int value, String colour, String action, boolean canBuy){
          this.position = position;
@@ -21,6 +24,8 @@ public class BoardLocation {
          this.colour = colour;
          this.action = action;
          this.canBuy = canBuy;
+         this.isOwned = false;
+         this.owner = null;
      }
 
      public String getInformation(){
@@ -28,48 +33,17 @@ public class BoardLocation {
          return info;
      }
 
-    // Loz>>>
-//    int tileCoord;
-//
-//    BoardLocation(int tileCoord) {
-//        this.tileCoord = tileCoord;
-//    }
-//    public abstract boolean isLocationOccupied();
-//    public abstract Piece getPiece();
-//    public abstract String getInformation();
-//
-//    private static final class EmptyLocation extends BoardLocation{
-//        EmptyLocation(int loc) {
-//            super(loc)
-//        }
-//        @Override
-//        public boolean isLocationOccupied(){
-//            return false;
-//        }
-//
-//        @Override
-//        public Piece getPiece() {
-//            return null;
-//        }
-//
-//    }
-//
-//    private static final class OccupiedLocation extends Tile{
-//        Piece pieceonLocation;
-//
-//        OccupiedLocation (int tileCoord, Piece pieceonLocation){
-//            super(tileCoord);
-//            this.pieceonTile = pieceonTile;
-//        }
-//
-//        @Override
-//        public boolean isTileOccupied(){
-//            return true;
-//        }
-//
-//        @Override
-//        public Piece getpiece(){
-//            return this.pieceonLoaction;
-//        }
-//    }
+     public String getName(){
+         return name;
+     }
+
+     public int getPrice(){
+         return value;
+     }
+
+     public void setOwner(Player player){
+         owner = player;
+         isOwned = true;
+     }
+
 }

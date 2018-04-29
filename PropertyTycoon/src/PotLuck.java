@@ -1,6 +1,7 @@
 /**
  *
- * @author Kieran
+ * @author Oliver
+ *
  */
 class PotLuck {
 
