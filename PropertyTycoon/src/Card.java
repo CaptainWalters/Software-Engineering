@@ -27,8 +27,4 @@ public class Card {
         return value;
     }
 
-    private class IncorrectActionException extends Throwable {
-
-    }
-
 }

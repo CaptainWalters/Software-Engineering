@@ -15,7 +15,7 @@ import java.util.ArrayList;
  */
 public class ClassicGame{
 
-    int noOfPlayers = 0;
+    private int noOfPlayers;
     Player player1;
     Player player2;
     Player player3;
@@ -26,8 +26,7 @@ public class ClassicGame{
     Dice dice1;
     Dice dice2;
     Board board;
-
-    int freeParking = 0;
+    int freeParking;
 
     PotLuck potLuck;
     OpportunityKnocks opportunityKnocks;
@@ -39,6 +38,7 @@ public class ClassicGame{
 
     public ClassicGame(int noOfPlayers) throws IOException {
         this.noOfPlayers = noOfPlayers;
+        freeParking = 0;
         init();
         takeTurn();
         takeTurn();
@@ -53,7 +53,7 @@ public class ClassicGame{
         board = new Board();
         player1 = new Player(1, "Thea", Token.Smartphone, false);
         player2 = new Player(2, "Oliver", Token.Cat, false);
-        player3 = new Player(3,"Kieran", Token.Hatstand, false);
+        player3 = new Player(3, "Kieran", Token.Hatstand, false);
         player4 = new Player(4, "Loza", Token.Spoon, false);
         player5 = new Player(5, "Vlad", Token.Boot, false);
         player6 = new Player(6, "Thomas", Token.Goblet, false);
@@ -190,7 +190,7 @@ public class ClassicGame{
 
                 if (n == 0) {
                     currLoc.setOwner(player);
-                    player.pay(currLoc.getPrice());
+                    player.payMoney(currLoc.getPrice());
                     System.out.println("Player " + player.getPlayerName() + " now owns " + currLoc.getName());
                     System.out.println("Player " + player.getPlayerName() + " now has " + player.getMoney() + " coins");
                 } else if (n == 1) {
@@ -199,6 +199,59 @@ public class ClassicGame{
             } else if(!currLoc.canBuy){
                 //DO ACTION
             }
+        }
+    }
+
+    public void cardAction(Player currPlayer, Card card) throws Exception {
+        String action = card.getAction();
+        String value = card.getValue();
+        int house=0;
+        int hotel=0;
+
+        switch(action) {
+            case "get":
+                currPlayer.addMoney(Integer.parseInt(value));
+                break;
+            case "pay":
+                currPlayer.payMoney(Integer.parseInt(value));
+                break;
+            case "jump":
+                currPlayer.moveToPosition(Integer.parseInt(value));
+                break;
+            case "select":
+                //addMoney(Integer.parseInt(value));
+                break;
+            case "free":
+                addFreeParking(Integer.parseInt(value));
+                break;
+            case "collect":
+                int num = currPlayer.getPlayerNumber();
+                int collection = 0;
+                int val = Integer.parseInt(value);
+                Player thisPlayer = null;
+                for(int i=0;i<players.size();i++) {
+                    thisPlayer = players.get(i);
+                    if (thisPlayer.playerNo != num) {
+                        thisPlayer.payMoney(val);
+                        collection += val;
+                    }
+                }
+                currPlayer.addMoney(collection);
+                break;
+            case "move":
+                currPlayer.movePosition(Integer.getInteger(value));
+                break;
+            case "repair":
+                String[] repair = value.split(" ");
+                house = Integer.parseInt(repair[1]);
+                hotel = Integer.parseInt(repair[2]);
+                //TODO values * total number of buildings owned
+                break;
+            case "jail":
+                currPlayer.moveToPosition(99);
+                break;
+            default:
+                throw new Exception("NO ACTION!");
         }
     }
 
@@ -219,10 +272,18 @@ public class ClassicGame{
     public void nextTurn(int noOfPlayers){
         currentTurn +=1;
 
-        if(currentTurn>noOfPlayers-1){
+        if(currentTurn>noOfPlayers-1) {
             currentTurn = currentTurn % noOfPlayers;
         }
     }
 
-
+    public int getFreeParking(){
+        return freeParking;
     }
+
+    public void addFreeParking(int i){
+        freeParking += i;
+    }
+
+
+}
