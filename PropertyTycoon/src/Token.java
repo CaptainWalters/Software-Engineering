@@ -8,11 +8,6 @@ public enum Token {
     Goblet,
     Hatstand,
     Cat,
-    Spoon;
-
-    private boolean taken;
-
-    public void setTaken(){
-        taken = true;
-    }
+    Spoon,
+    NotInUse;
 }

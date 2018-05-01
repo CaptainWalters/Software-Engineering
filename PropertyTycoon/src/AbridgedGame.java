@@ -5,7 +5,7 @@
  */
 public class AbridgedGame{
 
-    AbridgedGame(int humanPlayers, int CPUPlayers) {
+    AbridgedGame(Player[] players) {
         System.out.println("AbridgedGame made");
     }
 

@@ -16,13 +16,9 @@ import java.util.ArrayList;
 public class ClassicGame{
 
     private int noOfPlayers;
-    Player player1;
-    Player player2;
-    Player player3;
-    Player player4;
-    Player player5;
-    Player player6;
-    ArrayList<Player> players = new ArrayList<>();
+
+
+    Player[] players;
     Dice dice1;
     Dice dice2;
     Board board;
@@ -36,11 +32,11 @@ public class ClassicGame{
     int currentTurn = 0;
     int roundNumber = 0;
 
-    public ClassicGame(int noOfPlayers) throws IOException {
-        this.noOfPlayers = noOfPlayers;
+    public ClassicGame(Player[] players) throws IOException {
+        this.players = players;
+        this.noOfPlayers = players.length;
         freeParking = 0;
         init();
-        takeTurn();
         takeTurn();
     }
 
@@ -51,20 +47,7 @@ public class ClassicGame{
     public void init() throws IOException {
 
         board = new Board();
-        player1 = new Player(1, "Thea", Token.Smartphone, false);
-        player2 = new Player(2, "Oliver", Token.Cat, false);
-        player3 = new Player(3, "Kieran", Token.Hatstand, false);
-        player4 = new Player(4, "Loza", Token.Spoon, false);
-        player5 = new Player(5, "Vlad", Token.Boot, false);
-        player6 = new Player(6, "Thomas", Token.Goblet, false);
 
-
-        players.add(player1);
-        players.add(player2);
-        players.add(player3);
-        players.add(player4);
-        players.add(player5);
-        players.add(player6);
 
         dice1 = new Dice();
         dice2 = new Dice();
@@ -88,7 +71,7 @@ public class ClassicGame{
         //option for player to buy house etc.
         // need to check if space is "Special"
         while(!gameFinished) {
-            Player currPlayer = players.get(currentTurn);
+            Player currPlayer = players[currentTurn];
             String playerName = currPlayer.getPlayerName();
             BoardLocation currLoc = board.board[currPlayer.getPosition()];
 
@@ -150,6 +133,10 @@ public class ClassicGame{
                 null,
                 okoptions,
                 okoptions[0]);
+
+        if(n == -1){
+            System.exit(0);
+        }
     }
 
     private void rollDiceDialog(String message) {
@@ -161,6 +148,10 @@ public class ClassicGame{
                 null,
                 rdoptions,
                 rdoptions[0]);
+
+        if(n == -1){
+            System.exit(0);
+        }
     }
 
     private void jailDialog(String message) {
@@ -172,6 +163,10 @@ public class ClassicGame{
                 null,
                 jailoptions,
                 jailoptions[0]);
+
+        if(n == -1){
+            System.exit(0);
+        }
     }
 
     private void offerToBuy(Player player) {
@@ -187,6 +182,10 @@ public class ClassicGame{
                         null,
                         buyoptions,
                         buyoptions[0]);
+
+                if(n == -1){
+                    System.exit(0);
+                }
 
                 if (n == 0) {
                     currLoc.setOwner(player);
@@ -229,8 +228,8 @@ public class ClassicGame{
                 int collection = 0;
                 int val = Integer.parseInt(value);
                 Player thisPlayer = null;
-                for(int i=0;i<players.size();i++) {
-                    thisPlayer = players.get(i);
+                for(int i=0;i<players.length;i++) {
+                    thisPlayer = players[i];
                     if (thisPlayer.playerNo != num) {
                         thisPlayer.payMoney(val);
                         collection += val;
@@ -256,7 +255,7 @@ public class ClassicGame{
     }
 
     private void isGameFinished() {
-        if(players.size()<2){
+        if(players.length<2){
             gameFinished = true;
         }
     }

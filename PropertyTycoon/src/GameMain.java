@@ -1,9 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import static java.lang.System.in;
+
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -14,40 +17,93 @@ import java.util.Scanner;
  */
 public class GameMain {
 
+
+
     public static void main(String[] args) throws IOException {
+        ImageIcon img = new ImageIcon("//resorces/logo.png");
         int totalPlayers = 0;
         int humanPlayers = 0;
         int CPUPlayers = 0;
+        Player[] players;
 
 
         //choose game type
         String[] options = new String[] {"Classic", "Abridged"};
-        int gameType = JOptionPane.showOptionDialog(null, "Please choose a game type", "Game selection",
+        int gameType = JOptionPane.showOptionDialog(null, "Please choose a game type", "Game type selection.",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
-                null, options, options[0]);
+                img, options, options[0]);
 
-        //choose how many players
-        while((totalPlayers == 0)||(totalPlayers>6)){
-            totalPlayers = 0;
-            int noOfPlayers = Integer.parseInt(JOptionPane.showInputDialog(null, "Enter the number of human players. Total players = 6 (human + cpu)"));
-            humanPlayers = noOfPlayers;
-            totalPlayers += noOfPlayers;
-            int noOfCPU = Integer.parseInt(JOptionPane.showInputDialog(null, "Enter the number of CPU players. Total players = 6 (human + cpu)"));
-            CPUPlayers = noOfCPU;
-            totalPlayers += noOfCPU;
+        if(gameType == -1){
+            System.exit(0);
         }
 
+        //choose how many players
+        totalPlayers = Integer.parseInt((JOptionPane.showInputDialog(null, "Enter the total number of players. Max players = 6","Number of players.",JOptionPane.QUESTION_MESSAGE)));
 
+        if(totalPlayers == -1){
+            System.exit(0);
+        }
 
+        players = new Player[totalPlayers];
+        String[] cpuoptions = new String[]{"No","Yes"};
+        ArrayList<String> tokenoptions = new ArrayList();
+        tokenoptions.add("Boot");
+        tokenoptions.add("Cat");
+        tokenoptions.add("Goblet");
+        tokenoptions.add("Hatstand");
+        tokenoptions.add("Smartphone");
+        tokenoptions.add("Spoon");
 
+        JTextField pname = new JTextField();
+        String[] toptions = new String[tokenoptions.size()];
+        tokenoptions.toArray(toptions);
 
+        JComboBox token = new JComboBox(toptions);
+        JComboBox cpu = new JComboBox(cpuoptions);
+        //Object[] message = {"Enter player name:", pname,"Select a token:", token,"CPU Player?", cpu };
 
+        for(int i = 1; i<=totalPlayers;i++){
+            Object[] message = {"Enter player name:", pname,"Select a token:", token,"CPU Player?", cpu };
+            Enum etoken = Token.NotInUse;
+            Boolean cpuChoice;
+
+            int option = JOptionPane.showConfirmDialog(null, message, "Player details.", JOptionPane.OK_CANCEL_OPTION);
+
+            if(option == -1){
+                System.exit(0);
+            }
+
+            if (option == JOptionPane.OK_OPTION) {
+                if(token.getSelectedItem().equals("Boot"))
+                    etoken = Token.Boot;
+                } else if (token.getSelectedItem().equals("Hatstand")){
+                    etoken = Token.Hatstand;
+                } else if(token.getSelectedItem().equals("Spoon")) {
+                    etoken = Token.Spoon;
+                } else if (token.getSelectedItem().equals("Goblet")) {
+                    etoken = Token.Goblet;
+                } else if (token.getSelectedItem().equals("Cat")) {
+                    etoken = Token.Cat;
+                } else if (token.getSelectedItem().equals("Smartphone")){
+                    etoken = Token.Smartphone;
+                }
+
+            if(cpu.getSelectedItem().equals("Yes")){
+                cpuChoice = true;
+            } else {
+                cpuChoice = false;
+            }
+
+            players[i-1] = new Player(i,pname.getText(),etoken,cpuChoice);
+            pname.setText("");
+            token.removeItem(token.getSelectedItem());
+        }
 
         if(gameType == 0){
-            ClassicGame game = new ClassicGame(totalPlayers);
+            ClassicGame game = new ClassicGame(players);
 
         } else if(gameType == 1){
-            AbridgedGame game = new AbridgedGame(humanPlayers, CPUPlayers);
+            AbridgedGame game = new AbridgedGame(players);
         }
 
         JFrame f = new JFrame("Player creation");
