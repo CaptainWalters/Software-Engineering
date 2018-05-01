@@ -10,7 +10,8 @@ takeTurn iterates through an arraylist of players, checking to see whether doubl
 
 -doAction(of card and boardlocation which are not properties.
 
-if property is owned doAction would be pay rent
+-<strike>if property is owned doAction would be pay rent</strike> [pays automatically now @ ClassicGame::offerToBuy() ]
+-BoardLocation: fix utilities and stations rent payment
 
 -if rent cannot be paid then mortgage or sell to bank
 

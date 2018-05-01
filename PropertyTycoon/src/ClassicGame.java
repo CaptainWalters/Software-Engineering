@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- *The ClassicGame class runs an instance of the classic game of property tycoon. It is responible for initializing
+ *The ClassicGame class runs an instance of the classic game of property tycoon. It is responsible for initialising
  * the board, players, dice and cards.
  *
  */
@@ -100,7 +100,8 @@ public class ClassicGame{
 
             //Check location.
             offerToBuy(currPlayer);
-
+            //@146674: Develop location with property (method automatically checks if player is able to do so)
+            developLocation(currPlayer);
 
             //check space and do operations
 
@@ -113,7 +114,9 @@ public class ClassicGame{
 
                 //Check space and do operations
                 offerToBuy(currPlayer);
-
+                //@146674: Develop location with houses/hotel (method automatically checks if player is able to do so)
+                developLocation(currPlayer);
+                
                 //Check to see if player rolled doubles again
                 if (diceRoll[0] == diceRoll[1]) {
                     rollDiceDialog("You rolled doubles again. Roll again. If you get doubles you will go to jail.");
@@ -127,6 +130,9 @@ public class ClassicGame{
                     } else {
                         currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
                         offerToBuy(currPlayer);
+                        //@146674: Develop location with property (method automatically checks if player is able to do so)
+                        developLocation(currPlayer);
+                        
                         //Check space
                         nextTurn(noOfPlayers);
                     }
@@ -173,14 +179,30 @@ public class ClassicGame{
                 jailoptions,
                 jailoptions[0]);
     }
-
+    
+    //@146674
+    private void developLocation(Player player){
+        // Method to offer player if they would like to purchase houses/hotel when all locations on colour are owned
+        if (player.passedGo) {
+            BoardLocation currLoc = board.board[player.getPosition()];
+            if( board.getPropertiesOwnedByPlayerUsingColour(player, currLoc.getColour()) == 3){ // All properties owned (CHECK NUMBER OF PROPS)
+                System.out.println("Offering Player " + player.getPlayerName() + " chance to develop " + currLoc.getName());
+                for( int numOfProps = currLoc.numberOfPropertiesBuilt(); numOfProps<6; numOfProps++ ){
+                    // Ask if they would like to purchase a house or exit
+                    if( true ) currLoc.buyHouse(player); else return;
+                }
+            }
+        }
+    }
+    
+    //@146674 Edited/modified below
     private void offerToBuy(Player player) {
         if (player.passedGo) {
             BoardLocation currLoc = board.board[player.getPosition()];
-            if ((currLoc.canBuy) && (!currLoc.isOwned)) {
+            if (currLoc.canBuy() && !currLoc.isOwned()) {
                 Object[] buyoptions = {"Yes", "No"};
                 int n = JOptionPane.showOptionDialog(null,
-                        ("You have landed on " + currLoc.getName() + ", would you like to buy it for: " + currLoc.getPrice() + "?").toString(),
+                        ("You have landed on " + currLoc.getName() + ", would you like to buy it for: " + currLoc.getPrice() + "?"),
                         "Property Purchase",
                         JOptionPane.PLAIN_MESSAGE,
                         JOptionPane.QUESTION_MESSAGE,
@@ -196,8 +218,10 @@ public class ClassicGame{
                 } else if (n == 1) {
                     //trade(currLoc);
                 }
-            } else if(!currLoc.canBuy){
-                //DO ACTION
+            } else if( currLoc.isOwned() && !currLoc.getOwner().equals( player ) ){
+                // @146674: if square is owned and cannot be baught, force player to pay rent if not owned by themselves
+                System.out.println("Player " + player.getPlayerName() + " paid " + currLoc.getOwner().getPlayerName() + " the amount of " + currLoc.getRentPrice() + " for landing on " + currLoc.getName());
+                player.payMoney( currLoc.getRentPrice() );
             }
         }
     }
@@ -219,7 +243,7 @@ public class ClassicGame{
                 currPlayer.moveToPosition(Integer.parseInt(value));
                 break;
             case "select":
-                //addMoney(Integer.parseInt(value));
+                //addMoney(Integer.parseInt(locationValue));
                 break;
             case "free":
                 addFreeParking(Integer.parseInt(value));
