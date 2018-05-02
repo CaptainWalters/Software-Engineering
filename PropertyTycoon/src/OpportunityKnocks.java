@@ -1,7 +1,0 @@
-/**
- *
- * @author Oliver
- */
-class OpportunityKnocks {
-
-}

@@ -24,8 +24,8 @@ public class ClassicGame{
     Board board;
     int freeParking;
 
-    PotLuck potLuck;
-    OpportunityKnocks opportunityKnocks;
+    Deck potLuck;
+    Deck opportunityKnocks;
 
     Boolean gameFinished = false;
 
@@ -52,8 +52,8 @@ public class ClassicGame{
         dice1 = new Dice();
         dice2 = new Dice();
 
-        potLuck = new PotLuck();
-        opportunityKnocks = new OpportunityKnocks();
+        //potLuck = new Deck();
+        //opportunityKnocks = new Deck();
 
         System.out.println("Game has been initialized");
     }
