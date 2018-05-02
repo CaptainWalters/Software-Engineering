@@ -14,8 +14,6 @@ takeTurn iterates through an arraylist of players, checking to see whether doubl
 
 -BoardLocation: fix utilities and stations rent payment
 
--Fix player payment system (current simply removes x amount from sender instead of transfering x amount from sender to receiver)
-
 -if rent cannot be paid then mortgage or sell to bank
 
 -free parking

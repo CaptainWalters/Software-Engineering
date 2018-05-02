@@ -15,7 +15,7 @@ public class BoardLocation {
      private final int[] rentValue; // @146674 rent values
      private int propertyType; // @146674 property type on this location (refer to rent values index for property type)
      private final String colour;
-     private String action;
+     private final String action;
      private boolean canBuy;
      private Player owner;
 
@@ -81,17 +81,27 @@ public class BoardLocation {
      public int numberOfPropertiesBuilt(){
          return this.propertyType;
      }
+      
+     //@146674
+     /*
+     public boolean doAction(Player player){
+         // does nothing yet ... (implement)
+         switch(this.action){
+             case "collectfines":
+                 break;
+             default:
+                 break;
+         }
+         return false;
+     }*/
+     // Data is now fed to ClassicGame::doAction() using value from this method
+     public String getAction(){
+         return this.action;
+     }
+
      
      //@146674
      public Boolean buyHouse(Player player){
-
-         /* !!!WARNING!!!
-         Below needs to be implemented in ClassicGame.java where the condition below
-         is checked before this method (buyHouse()) can be executed.
-          !!!WARNING!!! */
-         // check if all colour props are owned by player
-         //if( new Board().getPropertiesOwnedByPlayerUsingColour(plyr, this.colour) == 0)
-         //    return;
 
          // check if this location is maxed out with houses
          if( this.propertyType >= 5 )
@@ -131,7 +141,8 @@ public class BoardLocation {
                  return false; // Do nothing for utility/station and card locations
          }
          
-         player.payMoney(price); // this should be checked if true (player has enough money) before incrementing 
+         // Only pay the bank 
+         player.payMoney(price); // this should be checked if true (player has enough money) before incrementing
          this.propertyType++; // Add a house
          System.out.println("Player " + player.getPlayerName() + " has built " + this.propertyType + " house(s) on " + this.getName());
          return true;

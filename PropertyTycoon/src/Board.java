@@ -48,7 +48,7 @@ public class Board {
          board[17] = new BoardLocation(17,"Pot Luck", 0, new int[]{0,0,0,0,0,0},"","Pick pot luck card", false);
          board[18] = new BoardLocation(18,"Wolowitz Street", 180, new int[]{14, 70, 200, 550, 750, 950},"orange","", true);
          board[19] = new BoardLocation(19,"Penny Lane", 200, new int[]{16, 80, 220, 600, 800, 1000},"orange","", true);
-         board[20] = new BoardLocation(20,"Free Parking", 0, new int[]{0,0,0,0,0,0},"","Collect Fines", false);
+         board[20] = new BoardLocation(20,"Free Parking", 0, new int[]{0,0,0,0,0,0},"","collectfines", false);
          board[21] = new BoardLocation(21,"Yue Fei Square", 220, new int[]{18, 90, 250, 700, 875, 1050},"red","", true);
          board[22] = new BoardLocation(22,"Opportunity Knocks", 0, new int[]{0,0,0,0,0,0},"","Pick opportunity knocks card", false);
          board[23] = new BoardLocation(23,"Mulan Rouge", 220, new int[]{18, 90, 250, 700, 875, 1050},"red","", true);

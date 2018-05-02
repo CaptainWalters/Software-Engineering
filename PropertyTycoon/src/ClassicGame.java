@@ -97,9 +97,15 @@ public class ClassicGame{
             int diceRoll[] = rollDice();
             diceRollDialog(diceRoll);
             currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
-
-            //Check location.
+            
+            // Check location if purchasable or pay rent otherwise
             offerToBuy(currPlayer);
+            
+            // See if location has any actions and exit turn if true (to avoid purchasing houses/hotel)
+            if( doAction(currPlayer, diceRoll) )
+                    ; // Do nothing
+                    //break; // This currently ends the game prematurely (FIX)
+            
             //@146674: Develop location with property (method automatically checks if player is able to do so)
             developLocation(currPlayer);
 
@@ -112,8 +118,15 @@ public class ClassicGame{
                 diceRollDialog(diceRoll);
                 currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
 
+
                 //Check space and do operations
                 offerToBuy(currPlayer);
+                
+                // See if location has any actions and exit turn if true (to avoid purchasing houses/hotel)
+                if( doAction(currPlayer, diceRoll) )
+                        ; // Do nothing
+                        //break; // This currently ends the game prematurely (FIX)
+            
                 //@146674: Develop location with houses/hotel (method automatically checks if player is able to do so)
                 developLocation(currPlayer);
                 
@@ -129,7 +142,14 @@ public class ClassicGame{
                         //currPlayer.moveToPosition(99);
                     } else {
                         currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
+                        
                         offerToBuy(currPlayer);
+                        
+                        // See if location has any actions and exit turn if true (to avoid purchasing houses/hotel)
+                        if( doAction(currPlayer, diceRoll) )
+                                ; // Do nothing
+                                //break; // This currently ends the game prematurely (FIX)
+
                         //@146674: Develop location with property (method automatically checks if player is able to do so)
                         developLocation(currPlayer);
                         
@@ -221,9 +241,43 @@ public class ClassicGame{
             } else if( currLoc.isOwned() && !currLoc.getOwner().equals( player ) ){
                 // @146674: if square is owned and cannot be baught, force player to pay rent if not owned by themselves
                 System.out.println("Player " + player.getPlayerName() + " paid " + currLoc.getOwner().getPlayerName() + " the amount of " + currLoc.getRentPrice() + " for landing on " + currLoc.getName());
-                player.payMoney( currLoc.getRentPrice() );
+                player.payMoney( currLoc.getRentPrice() ); // Take rent money from current player
+                currLoc.getOwner().addMoney( currLoc.getRentPrice() ); // Add rent money to landlord
             }
         }
+    }
+    
+    //@146674
+    public boolean doAction(Player player, int[] dice){
+        //System.out.println("[OVERRIDE] doAction init");
+        if (player.passedGo) {
+            BoardLocation currLoc = board.board[player.getPosition()];
+            switch( currLoc.getAction() ){
+                // Free parking
+                case "collectfines":
+                    System.out.println("Player " + player.getPlayerName() + " collected " + getFreeParkingAmount() + " from Free Parking");
+                    player.addMoney( collectFreeParking() );
+                    return true;
+                
+                // Utility companies
+                case "utilities":
+                    int value = 0;
+                    // check if player owns 1 or 2 utils
+                    int utils = board.getPropertiesOwnedByPlayerUsingColour(player, "utilities");
+                    // if 1, rent = 4x sum(dice)
+                    if( utils == 1) value = ( (dice[0]+dice[1]) * 4 );
+                    // if 2, rent = 10x sum(dice)
+                    if( utils == 2) value = ( (dice[0]+dice[1]) * 10 );
+                    System.out.println("[OVERRIDE] Player " + player.getPlayerName() + " has paid " + value + " to " + currLoc.getOwner().getPlayerName() +" for landing on " + currLoc.getName());
+                    player.payMoney(value);
+                    currLoc.getOwner().addMoney(value);
+                    return true;
+                    
+                default: // Do nothing if no action
+                    return false;
+            }
+        }
+        return false;
     }
 
     public void cardAction(Player currPlayer, Card card) throws Exception {
@@ -238,6 +292,7 @@ public class ClassicGame{
                 break;
             case "pay":
                 currPlayer.payMoney(Integer.parseInt(value));
+                addFreeParking(Integer.parseInt(value));
                 break;
             case "jump":
                 currPlayer.moveToPosition(Integer.parseInt(value));
@@ -294,20 +349,26 @@ public class ClassicGame{
     }
 
     public void nextTurn(int noOfPlayers){
-        currentTurn +=1;
+        this.currentTurn +=1;
 
-        if(currentTurn>noOfPlayers-1) {
-            currentTurn = currentTurn % noOfPlayers;
+        if(this.currentTurn>noOfPlayers-1) {
+            this.currentTurn = this.currentTurn % noOfPlayers;
         }
     }
 
-    public int getFreeParking(){
-        return freeParking;
+    public int getFreeParkingAmount(){
+        return this.freeParking;
+    }
+    
+    //@146674
+    public int collectFreeParking(){
+        int fp = this.freeParking; // Put actual FreeParking value into temporary variable
+        this.freeParking = 0; // Reset actual FreeParking value
+        return fp; // Return FreeParking temporary variable value
     }
 
     public void addFreeParking(int i){
         freeParking += i;
     }
-
-
+    
 }
