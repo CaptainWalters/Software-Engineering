@@ -16,8 +16,8 @@ public class BoardLocation {
      private int propertyType; // @146674 property type on this location (refer to rent values index for property type)
      private final String colour;
      private final String action;
-     private boolean canBuy;
-     private Player owner;
+     private boolean canBuy; // Should not be final
+     private Player owner; // Should not be final
 
      public BoardLocation(int position, String name, int value, int[] rent, String colour, String action, boolean canBuy){
          this.position = position;
@@ -83,18 +83,7 @@ public class BoardLocation {
      }
       
      //@146674
-     /*
-     public boolean doAction(Player player){
-         // does nothing yet ... (implement)
-         switch(this.action){
-             case "collectfines":
-                 break;
-             default:
-                 break;
-         }
-         return false;
-     }*/
-     // Data is now fed to ClassicGame::doAction() using value from this method
+     // Location Action is now fed to ClassicGame::doAction() using value from this method
      public String getAction(){
          return this.action;
      }

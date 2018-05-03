@@ -101,10 +101,8 @@ public class ClassicGame{
             // Check location if purchasable or pay rent otherwise
             offerToBuy(currPlayer);
             
-            // See if location has any actions and exit turn if true (to avoid purchasing houses/hotel)
-            if( doAction(currPlayer, diceRoll) )
-                    ; // Do nothing
-                    //break; // This currently ends the game prematurely (FIX)
+            //@146674: See if location has any actions
+            doAction(currPlayer, diceRoll);
             
             //@146674: Develop location with property (method automatically checks if player is able to do so)
             developLocation(currPlayer);
@@ -122,10 +120,8 @@ public class ClassicGame{
                 //Check space and do operations
                 offerToBuy(currPlayer);
                 
-                // See if location has any actions and exit turn if true (to avoid purchasing houses/hotel)
-                if( doAction(currPlayer, diceRoll) )
-                        ; // Do nothing
-                        //break; // This currently ends the game prematurely (FIX)
+                //@146674: See if location has any actions
+                doAction(currPlayer, diceRoll);
             
                 //@146674: Develop location with houses/hotel (method automatically checks if player is able to do so)
                 developLocation(currPlayer);
@@ -145,12 +141,10 @@ public class ClassicGame{
                         
                         offerToBuy(currPlayer);
                         
-                        // See if location has any actions and exit turn if true (to avoid purchasing houses/hotel)
-                        if( doAction(currPlayer, diceRoll) )
-                                ; // Do nothing
-                                //break; // This currently ends the game prematurely (FIX)
+                        // See if location has any actions
+                        doAction(currPlayer, diceRoll);
 
-                        //@146674: Develop location with property (method automatically checks if player is able to do so)
+                        //@146674: See if location has any actions
                         developLocation(currPlayer);
                         
                         //Check space
@@ -205,7 +199,12 @@ public class ClassicGame{
         // Method to offer player if they would like to purchase houses/hotel when all locations on colour are owned
         if (player.passedGo) {
             BoardLocation currLoc = board.board[player.getPosition()];
-            if( board.getPropertiesOwnedByPlayerUsingColour(player, currLoc.getColour()) == 3){ // All properties owned (CHECK NUMBER OF PROPS)
+            
+            if(!currLoc.canBuy()) return; // Shouldn't be able to develop a property you cannot own!
+            
+            int set = 3;
+            if( currLoc.getColour().equals("deep blue") || currLoc.getColour().equals("brown") ) set = 2;
+            if( board.getNumberOfPropertiesOwnedByPlayerUsingColour(player, currLoc.getColour()) == set){ // All properties owned (CHECK NUMBER OF PROPS)
                 System.out.println("Offering Player " + player.getPlayerName() + " chance to develop " + currLoc.getName());
                 for( int numOfProps = currLoc.numberOfPropertiesBuilt(); numOfProps<6; numOfProps++ ){
                     // Ask if they would like to purchase a house or exit
@@ -249,31 +248,37 @@ public class ClassicGame{
     
     //@146674
     public boolean doAction(Player player, int[] dice){
-        //System.out.println("[OVERRIDE] doAction init");
         if (player.passedGo) {
             BoardLocation currLoc = board.board[player.getPosition()];
             switch( currLoc.getAction() ){
                 // Free parking
                 case "collectfines":
+                    /* Uncomment this when cards have been implemented!!! Reason it's commented out is to demonstrate that Free Parking works
+                    if( getFreeParkingAmount() == 0 ) return false; // Ignore if value @ free parking is zero*/
+                    
                     System.out.println("Player " + player.getPlayerName() + " collected " + getFreeParkingAmount() + " from Free Parking");
                     player.addMoney( collectFreeParking() );
                     return true;
                 
                 // Utility companies
                 case "utilities":
+                    if(!currLoc.isOwned()) return false; // Ignore if utility location has not been purchased
+                    
                     int value = 0;
                     // check if player owns 1 or 2 utils
-                    int utils = board.getPropertiesOwnedByPlayerUsingColour(player, "utilities");
+                    int utils = board.getNumberOfPropertiesOwnedByPlayerUsingColour(player, "utilities");
                     // if 1, rent = 4x sum(dice)
                     if( utils == 1) value = ( (dice[0]+dice[1]) * 4 );
                     // if 2, rent = 10x sum(dice)
                     if( utils == 2) value = ( (dice[0]+dice[1]) * 10 );
+                    System.out.println("[DEBUG] PLAYER: " + player.getPlayerName() + ", UTILITIES OWNED: " + utils + ",  DICE 0:" + dice[0] + ", DICE 1: " + dice[1] + ", VALUE: " + value);
                     System.out.println("[OVERRIDE] Player " + player.getPlayerName() + " has paid " + value + " to " + currLoc.getOwner().getPlayerName() +" for landing on " + currLoc.getName());
                     player.payMoney(value);
                     currLoc.getOwner().addMoney(value);
                     return true;
                     
                 default: // Do nothing if no action
+                    System.out.println("Action '" + currLoc.getAction() + "' is not implemented.");
                     return false;
             }
         }

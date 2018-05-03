@@ -18,7 +18,18 @@ public class Board {
          return board[position].getInformation();
      }
      
-     public int getPropertiesOwnedByPlayerUsingColour(Player player, String colourCheck){
+     //@146674
+     public int getNumberOfPropertiesOwnedByPlayer(Player player){
+         int out = 0;
+         for (BoardLocation location : board)
+             if( location.isOwned() )
+                if( location.getOwner().equals(player) )
+                    out++;
+         return out;
+     }
+     
+     //@146674
+     public int getNumberOfPropertiesOwnedByPlayerUsingColour(Player player, String colourCheck){
          int out = 0;
          for (BoardLocation location : board)
              if( location.getColour().equals(colourCheck) && location.isOwned() )
@@ -40,7 +51,7 @@ public class Board {
          board[9] = new BoardLocation(9,"Nardole Drive", 120, new int[]{8, 40, 100, 300, 450, 600},"blue","", true);
          board[10] = new BoardLocation(10,"Just Visiting", 0, new int[]{0,0,0,0,0,0},"","", false);
          board[11] = new BoardLocation(11,"Skywalker Drive", 140, new int[]{10, 50, 150, 450, 625, 750},"purple","", true);
-         board[12] = new BoardLocation(12,"Tesla PowerCo", 150, new int[]{0,0,0,0,0,0},"utilities","", true);
+         board[12] = new BoardLocation(12,"Tesla PowerCo", 150, new int[]{0,0,0,0,0,0},"utilities","utilities", true);
          board[13] = new BoardLocation(13,"Wookie Hole ", 140, new int[]{10, 50, 150, 450, 625, 750},"purple","", true);
          board[14] = new BoardLocation(14,"Rey Lane", 160, new int[]{12, 60, 180, 500, 700, 900},"purple","", true);
          board[15] = new BoardLocation(15,"Hove Station", 200, new int[]{25,50,100,200,200,200},"station","", true);
@@ -56,7 +67,7 @@ public class Board {
          board[25] = new BoardLocation(25,"Falmer Station", 200, new int[]{25,50,100,200,200,200},"station","", true);
          board[26] = new BoardLocation(26,"Kirk Close", 260, new int[]{22, 110, 330, 800, 975, 1150},"yellow","", true);
          board[27] = new BoardLocation(27,"Picard", 260, new int[]{22, 110, 330, 800, 975, 1150},"yellow","", true);
-         board[28] = new BoardLocation(28,"Edison Water", 150, new int[]{0,0,0,0,0,0},"utilities","", true);
+         board[28] = new BoardLocation(28,"Edison Water", 150, new int[]{0,0,0,0,0,0},"utilities","utilities", true);
          board[29] = new BoardLocation(29,"Crusher Creek", 280, new int[]{22, 120, 360, 850, 1025, 1200},"yellow","", true);
          board[30] = new BoardLocation(30," Go to Jail", 0, new int[]{0,0,0,0,0,0},"","Go to Jail", false);
          board[31] = new BoardLocation(31,"Sirat Mews", 300, new int[]{26, 130, 390, 900, 1100, 1275},"green","", true);
