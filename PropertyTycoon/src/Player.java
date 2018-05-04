@@ -42,6 +42,7 @@ public class Player {
     //Getters & Setters
 
     private void passedGo() {
+        System.out.println("Player " + playerName + " has passed GO!"); // DEBUG
         money+=200;
     }
 

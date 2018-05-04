@@ -1,18 +1,14 @@
 import javax.swing.*;
-import java.awt.*;
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import static java.lang.System.in;
-import java.util.Scanner;
-
 
 /**
- *
+ * Model = GameData&Logic, View = GUI, Controller = main()
+ * MVC model where the CONTROLLER will pull data from MODEL and send the data to VIEW to render visually
  * @author Kieran(132206)
  *
  */
 public class GameMain {
+    // THIS WHOLE FILE IS THE CONTROLLER
 
     public static void main(String[] args) throws IOException {
         int totalPlayers = 0;
@@ -44,10 +40,10 @@ public class GameMain {
 
 
         if(gameType == 0){
-            ClassicGame game = new ClassicGame(totalPlayers);
+            ClassicGame game = new ClassicGame(totalPlayers); // MODEL (Data&Logic)
 
         } else if(gameType == 1){
-            AbridgedGame game = new AbridgedGame(humanPlayers, CPUPlayers);
+            AbridgedGame game = new AbridgedGame(humanPlayers, CPUPlayers); // MODEL (Data&Logic)
         }
 
         JFrame f = new JFrame("Player creation");

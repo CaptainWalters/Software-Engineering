@@ -90,7 +90,7 @@ public class ClassicGame{
         while(!gameFinished) {
             Player currPlayer = players.get(currentTurn);
             String playerName = currPlayer.getPlayerName();
-            BoardLocation currLoc = board.board[currPlayer.getPosition()];
+            //BoardLocation currLoc = board.board[currPlayer.getPosition()]; // Not Used
 
             //1st roll
             rollDiceDialog(playerName + ", it is your turn. Please roll the dice.");
@@ -99,13 +99,13 @@ public class ClassicGame{
             currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
             
             // Check location if purchasable or pay rent otherwise
-            offerToBuy(currPlayer);
+            //offerToBuy(currPlayer); // now executed in doAction()
             
-            //@146674: See if location has any actions
+            //@146674: Execute board location action on player
             doAction(currPlayer, diceRoll);
             
             //@146674: Develop location with property (method automatically checks if player is able to do so)
-            developLocation(currPlayer);
+            //developLocation(currPlayer); // now executed in doAction()
 
             //check space and do operations
 
@@ -116,15 +116,14 @@ public class ClassicGame{
                 diceRollDialog(diceRoll);
                 currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
 
-
                 //Check space and do operations
-                offerToBuy(currPlayer);
+                //offerToBuy(currPlayer); // now executed in doAction()
                 
-                //@146674: See if location has any actions
+                //@146674: Execute board location action on player
                 doAction(currPlayer, diceRoll);
             
                 //@146674: Develop location with houses/hotel (method automatically checks if player is able to do so)
-                developLocation(currPlayer);
+                //developLocation(currPlayer); // now executed in doAction()
                 
                 //Check to see if player rolled doubles again
                 if (diceRoll[0] == diceRoll[1]) {
@@ -139,13 +138,13 @@ public class ClassicGame{
                     } else {
                         currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
                         
-                        offerToBuy(currPlayer);
+                        //offerToBuy(currPlayer); // now executed in doAction()
                         
-                        // See if location has any actions
+                        //@146674: Execute board location action on player
                         doAction(currPlayer, diceRoll);
 
                         //@146674: See if location has any actions
-                        developLocation(currPlayer);
+                        //developLocation(currPlayer); // now executed in doAction()
                         
                         //Check space
                         nextTurn(noOfPlayers);
@@ -195,20 +194,37 @@ public class ClassicGame{
     }
     
     //@146674
+    // Develop Location popup dialog box
+    private int developLocationDialog(String locationName, int developmentPrice) {
+        return JOptionPane.showOptionDialog(null,
+            ("Would you like to develop " + locationName + " for " + developmentPrice + "?"),
+            "Develop Location",
+            JOptionPane.PLAIN_MESSAGE,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            new Object[]{"Yes", "No"},
+            "No");
+    }
+    
+    //@146674
     private void developLocation(Player player){
         // Method to offer player if they would like to purchase houses/hotel when all locations on colour are owned
         if (player.passedGo) {
             BoardLocation currLoc = board.board[player.getPosition()];
             
             if(!currLoc.canBuy()) return; // Shouldn't be able to develop a property you cannot own!
+            if(!currLoc.getAction().equals("")) return; // Ignore developing locations with actions (like Utils/Stations/FreeParking/etc.)
             
-            int set = 3;
-            if( currLoc.getColour().equals("deep blue") || currLoc.getColour().equals("brown") ) set = 2;
-            if( board.getNumberOfPropertiesOwnedByPlayerUsingColour(player, currLoc.getColour()) == set){ // All properties owned (CHECK NUMBER OF PROPS)
+            int set = 3;// Set number of properties in colour
+            if( currLoc.getColour().equals("deep blue") || currLoc.getColour().equals("brown") ) set = 2; // These colours only have two locations on board
+            
+            if( board.getNumberOfPropertiesOwnedByPlayerUsingColour(player, currLoc.getColour()) == set){ // Check player owns all properties in that colour
                 System.out.println("Offering Player " + player.getPlayerName() + " chance to develop " + currLoc.getName());
-                for( int numOfProps = currLoc.numberOfPropertiesBuilt(); numOfProps<6; numOfProps++ ){
-                    // Ask if they would like to purchase a house or exit
-                    if( true ) currLoc.buyHouse(player); else return;
+                for( int numOfProps = currLoc.numberOfPropertiesBuilt(); numOfProps<5; numOfProps++ ){
+                    // Ask if player would like to purchase a house (and loop) or exit
+                    if( developLocationDialog(currLoc.getName(), currLoc.getHouseDevelopmentPrice()) == 0 )
+                        currLoc.buyHouse(player);
+                    else return;
                 }
             }
         }
@@ -221,7 +237,7 @@ public class ClassicGame{
             if (currLoc.canBuy() && !currLoc.isOwned()) {
                 Object[] buyoptions = {"Yes", "No"};
                 int n = JOptionPane.showOptionDialog(null,
-                        ("You have landed on " + currLoc.getName() + ", would you like to buy it for: " + currLoc.getPrice() + "?"),
+                        (player.getPlayerName() + ", you have landed on " + currLoc.getName() + ", would you like to buy it for: " + currLoc.getPrice() + "?"),
                         "Property Purchase",
                         JOptionPane.PLAIN_MESSAGE,
                         JOptionPane.QUESTION_MESSAGE,
@@ -237,7 +253,7 @@ public class ClassicGame{
                 } else if (n == 1) {
                     //trade(currLoc);
                 }
-            } else if( currLoc.isOwned() && !currLoc.getOwner().equals( player ) ){
+            } else if( currLoc.isOwned() && !currLoc.getOwner().equals( player ) && currLoc.getAction().equals("") ){
                 // @146674: if square is owned and cannot be baught, force player to pay rent if not owned by themselves
                 System.out.println("Player " + player.getPlayerName() + " paid " + currLoc.getOwner().getPlayerName() + " the amount of " + currLoc.getRentPrice() + " for landing on " + currLoc.getName());
                 player.payMoney( currLoc.getRentPrice() ); // Take rent money from current player
@@ -247,10 +263,18 @@ public class ClassicGame{
     }
     
     //@146674
+    // Executes an action on player that landed on a location during their turn
     public boolean doAction(Player player, int[] dice){
         if (player.passedGo) {
             BoardLocation currLoc = board.board[player.getPosition()];
             switch( currLoc.getAction() ){
+                // Pass GO
+                case "landGO":
+                    // Make sure it isn't first GO (or people will get +200 boost) [FIX THIS]
+                    System.out.println("Player " + player.getPlayerName() + " landed on GO!");
+                    //player.addMoney( 200 ); // [DISABLED] Set to give player £200 bonus if they land on GO
+                    break;
+                
                 // Free parking
                 case "collectfines":
                     /* Uncomment this when cards have been implemented!!! Reason it's commented out is to demonstrate that Free Parking works
@@ -259,26 +283,70 @@ public class ClassicGame{
                     System.out.println("Player " + player.getPlayerName() + " collected " + getFreeParkingAmount() + " from Free Parking");
                     player.addMoney( collectFreeParking() );
                     return true;
+                    
+                // Income Tax
+                case "taxIncome":
+                    System.out.println("Player " + player.getPlayerName() + " landed on Income Tax! Pay £200.");
+                    player.payMoney( 200 ); // Player pay penality of £200 to Free Parking
+                    addFreeParking( 200 );
+                    break;
                 
-                // Utility companies
+                // Super Tax
+                case "taxSuper":
+                    System.out.println("Player " + player.getPlayerName() + " landed on Super Tax! Pay £100.");
+                    player.addMoney( 100 ); // Player pay penality of £100 to Free Parking
+                    addFreeParking( 100 );
+                    break;
+                    
+                // Pot Luck card action [FIX THIS!!!]
+                case "doPLCard":
+                    //PotLuck card = new PotLuck();
+                    //cardAction(player, card);
+                    //break;
+                
+                // Opportunity Knocks card action [FIX THIS!!!]
+                case "doOKCard":
+                    //OpportunityKnocks card = new OpportunityKnocks();
+                    //cardAction(player, card);
+                    //break;
+                    
+                // Go to Jail [FIX THIS!!!]
+                case "doGoToJail":
+                    //System.out.println("doGoToJail hook trigger");
+                    ; // Do nothing atm [FIX THIS!!!]
+                
+                // Utility company (DO NOT MOVE, MUST BE NEAR default CASE)
                 case "utilities":
-                    if(!currLoc.isOwned()) return false; // Ignore if utility location has not been purchased
+                    if(!currLoc.isOwned()) break; // Break if utility location has not been purchased to pass to default case
+                    if(currLoc.getOwner().equals(player)) return false; // Ignore if landlord lands on own utility
                     
                     int value = 0;
                     // check if player owns 1 or 2 utils
-                    int utils = board.getNumberOfPropertiesOwnedByPlayerUsingColour(player, "utilities");
+                    int utils = board.getNumberOfPropertiesOwnedByPlayerUsingColour(currLoc.getOwner(), "utilities");
                     // if 1, rent = 4x sum(dice)
                     if( utils == 1) value = ( (dice[0]+dice[1]) * 4 );
                     // if 2, rent = 10x sum(dice)
                     if( utils == 2) value = ( (dice[0]+dice[1]) * 10 );
-                    System.out.println("[DEBUG] PLAYER: " + player.getPlayerName() + ", UTILITIES OWNED: " + utils + ",  DICE 0:" + dice[0] + ", DICE 1: " + dice[1] + ", VALUE: " + value);
-                    System.out.println("[OVERRIDE] Player " + player.getPlayerName() + " has paid " + value + " to " + currLoc.getOwner().getPlayerName() +" for landing on " + currLoc.getName());
+                    //System.out.println("[DEBUG] PLAYER: " + player.getPlayerName() + ", UTILITIES OWNED: " + utils + ",  DICE 0:" + dice[0] + ", DICE 1: " + dice[1] + ", VALUE: " + value);
+                    
+                    System.out.println("Player " + player.getPlayerName() + " paid " + currLoc.getOwner().getPlayerName() + " the amount of " + value + " for landing on " + currLoc.getName());
                     player.payMoney(value);
                     currLoc.getOwner().addMoney(value);
                     return true;
+                
+                // Stations (DO NOT MOVE, MUST BE NEAR default CASE)
+                case "station":
+                    //if(!currLoc.isOwned()) break; // Break if utility location has not been purchased to pass to default case
+                    //System.out.println("station hook trigger"); // DOES NOTHING atm [FIX THIS!!!]
+                    ; // Does nothing [FIX THIS!!!]
                     
-                default: // Do nothing if no action
-                    System.out.println("Action '" + currLoc.getAction() + "' is not implemented.");
+                default:
+                    System.out.println("Action '" + currLoc.getAction() + "' is not implemented.");  // Do nothing if no action
+                    // We actually put offerToBuy() here
+                    offerToBuy(player);
+                    // And developLocation() here as non-actionable locations are executed here!!!
+                    developLocation(player);
+                    // Thus clearing up line space in nextTurn()
                     return false;
             }
         }
