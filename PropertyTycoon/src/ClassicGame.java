@@ -7,10 +7,7 @@
 import javax.swing.*;
 import java.io.IOException;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  *The ClassicGame class runs an instance of the classic game of property tycoon. It is responsible for initialising
@@ -235,7 +232,7 @@ public class ClassicGame{
                     System.out.println("Player " + player.getPlayerName() + " now has " + player.getMoney() + " coins");
                 } else if (n == 1) {
                     //doAuction(currLoc);
-                    //doTrade(player);
+                    doTrade(player);
                 }
             } else if( currLoc.isOwned() && !currLoc.getOwner().equals( player ) && currLoc.getAction().equals("") ){
                 // @146674: if square is owned and cannot be baught, force player to pay rent if not owned by themselves
@@ -284,55 +281,97 @@ public class ClassicGame{
 
     //@132206
     // Creates a trade dialog for 2 players to trade a property.
-//    public void doTrade(Player currPlayer){
-//
-//        Player otherPlayer;
-//
-//        ArrayList<Player> otherPlayers = new ArrayList(players);
-//        otherPlayers.remove(currPlayer);
-//
-//
-//
-//        String[] oPS =
-//
-//        JComboBox playerBox = new JComboBox(otherPlayers.);
-//
-//        Object[] playerSelectionMessage = {"Please select the player you wish to trade with: ",playerBox};
-//        int playerOption = JOptionPane.showConfirmDialog(null, playerSelectionMessage, "Trade System.", JOptionPane.OK_CANCEL_OPTION);
-//
-//        if(playerOption == -1){
-//            System.exit(0);
-//        }
-//
-//        otherPlayer = (Player)playerBox.getSelectedItem();
-//
-//
-//
-//        ArrayList<String> playerProperties = new ArrayList<>();
-//
-//        for(int i = 0; i <39;i++){
-//            if(board.board[i].getOwner()==currPlayer){
-//                playerProperties.add(board.board[i].getName());
-//            }
-//        }
-//
-//
-//        Object[] pparray = playerProperties.toArray();
-//
-//        JComboBox pProperties = new JComboBox(pparray);
-//
-//        //Player[] otherPlayers = players;
-//
-//
-//        JComboBox tPlayer = new JComboBox(players);
-//
-//        Object[] message = {"Please select the property you wish to trade :",pProperties ,"Select the player you wish to trade with:", tPlayer,"CPU Player?"};
-//        int option = JOptionPane.showConfirmDialog(null, message, "Trade System.", JOptionPane.OK_CANCEL_OPTION);
-//
-//        if (option == -1){
-//            System.exit(0);
-//        }
-//    }
+    public void doTrade(Player currPlayer){
+
+        Player otherPlayer;
+
+        ArrayList<Player> otherPlayers = new ArrayList<>(Arrays.asList(players));
+        otherPlayers.remove(currPlayer);
+
+        String[] opa = new String[otherPlayers.size()];
+
+        for(int i = 0; i<otherPlayers.size();i++){
+            opa[i] = otherPlayers.get(i).getPlayerName();
+        }
+
+        JComboBox playerBox = new JComboBox(opa);
+
+        Object[] playerSelectionMessage = {"Please select the player you wish to trade with: ",playerBox};
+        int playerOption = JOptionPane.showConfirmDialog(null, playerSelectionMessage, "Trade System.", JOptionPane.OK_CANCEL_OPTION);
+
+        if(playerOption == -1){
+            System.exit(0);
+        }
+
+        otherPlayer = otherPlayers.get(playerBox.getSelectedIndex());
+
+
+
+        ArrayList<BoardLocation> playerProperties = new ArrayList<>();
+
+        for(int i = 0; i <39;i++){
+            if(board.board[i].getOwner()==currPlayer){
+                playerProperties.add(board.board[i]);
+            }
+        }
+
+        String[] playerPropertiesString = new String[playerProperties.size()];
+
+        for(int i = 0; i<playerProperties.size();i++){
+            playerPropertiesString[i] = playerProperties.get(i).getName();
+        }
+
+
+        ArrayList<BoardLocation> otherPlayerProperties = new ArrayList<>();
+
+        for(int i = 0; i <39;i++){
+            if(board.board[i].getOwner()==otherPlayer){
+                otherPlayerProperties.add(board.board[i]);
+            }
+        }
+
+        String[] otherPlayerPropertiesString = new String[otherPlayerProperties.size()];
+
+        for(int i = 0; i<otherPlayerProperties.size();i++){
+            otherPlayerPropertiesString[i] = otherPlayerProperties.get(i).getName();
+        }
+
+        JList pList = new JList(playerPropertiesString);
+        JList oList = new JList(otherPlayerPropertiesString);
+
+
+        Object[] message = {"Please select your properties that you wish to trade :",pList ,"Please select " + otherPlayer.getPlayerName() + "'s properties that you want:", oList};
+        int option = JOptionPane.showConfirmDialog(null, message, "Trade System.", JOptionPane.OK_CANCEL_OPTION);
+
+        if (option == -1){
+            System.exit(0);
+        }
+
+        int[] pSelected = pList.getSelectedIndices();
+        int[] oSelected = oList.getSelectedIndices();
+
+        BoardLocation[] selectedPlayersProperties = new BoardLocation[pSelected.length];
+        BoardLocation[] selectedOtherPlayersProperties = new BoardLocation[oSelected.length];
+
+        //playerPropeties at indexs in pSelected need to be changeOwner to otherPlayer
+        for(int i = 0; i<pSelected.length;i++){
+            selectedPlayersProperties[i] = playerProperties.get(pSelected[i]);
+        }
+
+
+        //otherPlayerProperties at indexs in oSelected need to be changeOwner to currPlayer
+        for(int i = 0; i<pSelected.length;i++){
+            selectedOtherPlayersProperties[i] = otherPlayerProperties.get(oSelected[i]);
+        }
+
+        for(int i = 0; i<selectedPlayersProperties.length;i++){
+            selectedPlayersProperties[i].setOwner(otherPlayer);
+        }
+
+        for(int i = 0; i<selectedOtherPlayersProperties.length;i++){
+            selectedOtherPlayersProperties[i].setOwner(currPlayer);
+        }
+    }
     
     //@146674
     // Executes an action on player that landed on a location during their turn
