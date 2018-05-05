@@ -1,6 +1,6 @@
 /**
  *
- * @author Kieran(132206)
+ * @author Kieran(132206), 146674
  *
  */
 
@@ -97,17 +97,9 @@ public class ClassicGame{
             int diceRoll[] = rollDice();
             diceRollDialog(diceRoll);
             currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
-            
-            // Check location if purchasable or pay rent otherwise
-            //offerToBuy(currPlayer); // now executed in doAction()
-            
+
             //@146674: Execute board location action on player
             doAction(currPlayer, diceRoll);
-            
-            //@146674: Develop location with property (method automatically checks if player is able to do so)
-            //developLocation(currPlayer); // now executed in doAction()
-
-            //check space and do operations
 
             //Check to see if player has rolled doubles.
             if (diceRoll[0] == diceRoll[1]) {
@@ -116,15 +108,9 @@ public class ClassicGame{
                 diceRollDialog(diceRoll);
                 currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
 
-                //Check space and do operations
-                //offerToBuy(currPlayer); // now executed in doAction()
-                
                 //@146674: Execute board location action on player
                 doAction(currPlayer, diceRoll);
             
-                //@146674: Develop location with houses/hotel (method automatically checks if player is able to do so)
-                //developLocation(currPlayer); // now executed in doAction()
-                
                 //Check to see if player rolled doubles again
                 if (diceRoll[0] == diceRoll[1]) {
                     rollDiceDialog("You rolled doubles again. Roll again. If you get doubles you will go to jail.");
@@ -138,13 +124,8 @@ public class ClassicGame{
                     } else {
                         currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
                         
-                        //offerToBuy(currPlayer); // now executed in doAction()
-                        
                         //@146674: Execute board location action on player
                         doAction(currPlayer, diceRoll);
-
-                        //@146674: See if location has any actions
-                        //developLocation(currPlayer); // now executed in doAction()
                         
                         //Check space
                         nextTurn(noOfPlayers);
@@ -203,7 +184,7 @@ public class ClassicGame{
             JOptionPane.QUESTION_MESSAGE,
             null,
             new Object[]{"Yes", "No"},
-            "No");
+            "Yes");
     }
     
     //@146674
@@ -218,13 +199,12 @@ public class ClassicGame{
             int set = 3;// Set number of properties in colour
             if( currLoc.getColour().equals("deep blue") || currLoc.getColour().equals("brown") ) set = 2; // These colours only have two locations on board
             
-            if( board.getNumberOfPropertiesOwnedByPlayerUsingColour(player, currLoc.getColour()) == set){ // Check player owns all properties in that colour
-                System.out.println("Offering Player " + player.getPlayerName() + " chance to develop " + currLoc.getName());
-                for( int numOfProps = currLoc.numberOfPropertiesBuilt(); numOfProps<5; numOfProps++ ){
+            if( board.getNumberOfLocationsOwnedByPlayerUsingColour(player, currLoc.getColour()) == set){ // Check player owns all properties in that colour
+                for( int numOfProps = currLoc.numberOfPropertiesBuilt(); numOfProps<5; numOfProps++ ){ // Loop through remaining undeveloped properties
                     // Ask if player would like to purchase a house (and loop) or exit
-                    if( developLocationDialog(currLoc.getName(), currLoc.getHouseDevelopmentPrice()) == 0 )
+                    if( developLocationDialog(currLoc.getName(), currLoc.getHouseDevelopmentPrice()) == 0 ) // Dialog 'Yes' button pressed
                         currLoc.buyHouse(player);
-                    else return;
+                    else return; // Dialog 'No' button pressed (exit loop)
                 }
             }
         }
@@ -267,18 +247,20 @@ public class ClassicGame{
     public boolean doAction(Player player, int[] dice){
         if (player.passedGo) {
             BoardLocation currLoc = board.board[player.getPosition()];
+            int value = 0; // Arbitrary final cost holder for calculations performed below
+            
             switch( currLoc.getAction() ){
+                /* Locations that cannot be purchased by the Player */
                 // Pass GO
                 case "landGO":
-                    // Make sure it isn't first GO (or people will get +200 boost) [FIX THIS]
                     System.out.println("Player " + player.getPlayerName() + " landed on GO!");
                     //player.addMoney( 200 ); // [DISABLED] Set to give player £200 bonus if they land on GO
-                    break;
+                    return false; // false because no action was actually performed (above is disabled)
                 
                 // Free parking
                 case "collectfines":
                     /* Uncomment this when cards have been implemented!!! Reason it's commented out is to demonstrate that Free Parking works
-                    if( getFreeParkingAmount() == 0 ) return false; // Ignore if value @ free parking is zero*/
+                    if( getFreeParkingAmount() == 0 ) return false; // Ignore if value/amount set at Free Parking is zero*/
                     
                     System.out.println("Player " + player.getPlayerName() + " collected " + getFreeParkingAmount() + " from Free Parking");
                     player.addMoney( collectFreeParking() );
@@ -289,40 +271,39 @@ public class ClassicGame{
                     System.out.println("Player " + player.getPlayerName() + " landed on Income Tax! Pay £200.");
                     player.payMoney( 200 ); // Player pay penality of £200 to Free Parking
                     addFreeParking( 200 );
-                    break;
+                    return true;
                 
                 // Super Tax
                 case "taxSuper":
                     System.out.println("Player " + player.getPlayerName() + " landed on Super Tax! Pay £100.");
                     player.addMoney( 100 ); // Player pay penality of £100 to Free Parking
                     addFreeParking( 100 );
-                    break;
+                    return true;
                     
-                // Pot Luck card action [FIX THIS!!!]
+                // Pot Luck card action
                 case "doPLCard":
-                    //PotLuck card = new PotLuck();
-                    //cardAction(player, card);
-                    //break;
+                    System.out.printf(player.getPlayerName() + ", Pot Luck! ");
+                    return cardAction(player, potLuck.drawCard());
                 
-                // Opportunity Knocks card action [FIX THIS!!!]
+                // Opportunity Knocks card action
                 case "doOKCard":
-                    //OpportunityKnocks card = new OpportunityKnocks();
-                    //cardAction(player, card);
-                    //break;
+                    System.out.printf(player.getPlayerName() + ", Opportunity Knocks! ");
+                    return cardAction(player, opportunityKnocks.drawCard());
                     
                 // Go to Jail [FIX THIS!!!]
                 case "doGoToJail":
                     //System.out.println("doGoToJail hook trigger");
-                    ; // Do nothing atm [FIX THIS!!!]
+                    return false; // Does nothing atm [FIX THIS!!!]
                 
+                /* Player purchasable board locations */
                 // Utility company (DO NOT MOVE, MUST BE NEAR default CASE)
                 case "utilities":
                     if(!currLoc.isOwned()) break; // Break if utility location has not been purchased to pass to default case
                     if(currLoc.getOwner().equals(player)) return false; // Ignore if landlord lands on own utility
                     
-                    int value = 0;
+                    value = 0; // Reset value
                     // check if player owns 1 or 2 utils
-                    int utils = board.getNumberOfPropertiesOwnedByPlayerUsingColour(currLoc.getOwner(), "utilities");
+                    int utils = board.getNumberOfLocationsOwnedByPlayerUsingColour(currLoc.getOwner(), "utilities");
                     // if 1, rent = 4x sum(dice)
                     if( utils == 1) value = ( (dice[0]+dice[1]) * 4 );
                     // if 2, rent = 10x sum(dice)
@@ -336,75 +317,111 @@ public class ClassicGame{
                 
                 // Stations (DO NOT MOVE, MUST BE NEAR default CASE)
                 case "station":
-                    //if(!currLoc.isOwned()) break; // Break if utility location has not been purchased to pass to default case
-                    //System.out.println("station hook trigger"); // DOES NOTHING atm [FIX THIS!!!]
-                    ; // Does nothing [FIX THIS!!!]
+                    if(!currLoc.isOwned()) break; // Break if utility location has not been purchased to pass to default case
+                    if(currLoc.getOwner().equals(player)) return false; // Ignore if landlord lands on own station
+                    
+                    value = 0; // Reset value
+                    // check if player how many stations landlord owns
+                    int stations = board.getNumberOfLocationsOwnedByPlayerUsingColour(currLoc.getOwner(), "station");
+
+                    if( stations == 2) value = 200;
+                    if( stations == 3) value = 300;
+                    if( stations == 3) value = 1000;
+                    
+                    System.out.println("Player " + player.getPlayerName() + " paid " + currLoc.getOwner().getPlayerName() + " the amount of " + value + " for landing on " + currLoc.getName());
+                    player.payMoney(value);
+                    currLoc.getOwner().addMoney(value);
+                    return true;
                     
                 default:
-                    System.out.println("Action '" + currLoc.getAction() + "' is not implemented.");  // Do nothing if no action
-                    // We actually put offerToBuy() here
+                    // Non-actionable locations are executed here
                     offerToBuy(player);
-                    // And developLocation() here as non-actionable locations are executed here!!!
                     developLocation(player);
-                    // Thus clearing up line space in nextTurn()
                     return false;
             }
         }
         return false;
     }
 
-    public void cardAction(Player currPlayer, Card card) throws Exception {
+    //public void cardAction(Player currPlayer, Card card) throws Exception {
+    public Boolean cardAction(Player player, Card card) {
         String action = card.getAction();
-        String value = card.getValue();
-        int house=0;
-        int hotel=0;
+        int value = card.getValue();
+        System.out.println( card.getDescription() );
 
         switch(action) {
             case "get":
-                currPlayer.addMoney(Integer.parseInt(value));
-                break;
-            case "pay":
-                currPlayer.payMoney(Integer.parseInt(value));
-                addFreeParking(Integer.parseInt(value));
-                break;
+                player.addMoney(value);
+                return true;
+            
+            case "payBank":
+                player.payMoney(value);
+                return true;
+            
+            case "payFreeParking":
+                player.payMoney(value);
+                addFreeParking(value);
+                return true;
+            
             case "jump":
-                currPlayer.moveToPosition(Integer.parseInt(value));
-                break;
+                player.moveToPosition(value);
+                doAction( player, rollDice() ); // Executes wherever player lands
+                return true;
+                
+            case "goBack3":
+                player.movePosition(-3); // Can we move back like this???
+                doAction( player, rollDice() ); // Executes wherever player lands
+                return true;
+            
             case "select":
                 //addMoney(Integer.parseInt(locationValue));
-                break;
-            case "free":
-                addFreeParking(Integer.parseInt(value));
-                break;
+                return false;
+            
+            //case "free":
+            //    addFreeParking(value);
+            //    break;
             case "collect":
-                int num = currPlayer.getPlayerNumber();
+                int num = player.getPlayerNumber();
                 int collection = 0;
-                int val = Integer.parseInt(value);
                 Player thisPlayer = null;
                 for(int i=0;i<players.size();i++) {
                     thisPlayer = players.get(i);
                     if (thisPlayer.playerNo != num) {
-                        thisPlayer.payMoney(val);
-                        collection += val;
+                        thisPlayer.payMoney(value);
+                        collection += value;
                     }
                 }
-                currPlayer.addMoney(collection);
-                break;
+                player.addMoney(collection);
+                return true;
+            
             case "move":
-                currPlayer.movePosition(Integer.getInteger(value));
-                break;
+                player.movePosition(value);
+                return true;
+            
             case "repair":
-                String[] repair = value.split(" ");
-                house = Integer.parseInt(repair[1]);
-                hotel = Integer.parseInt(repair[2]);
-                //TODO values * total number of buildings owned
-                break;
-            case "jail":
-                currPlayer.moveToPosition(99);
-                break;
+                int houses = board.getNumberOfHousesDevelopedByPlayer(player);
+                int hotels = board.getNumberOfHotelsDevelopedByPlayer(player);
+                int repairCost = 0;
+                //TODO values * total number of buildings owned (houses + hotels)
+                if( value == 25) repairCost = (25 * houses) + (100 * hotels);
+                if( value == 40) repairCost = (40 * houses) + (115 * hotels);
+                System.out.println("Player " + player.getPlayerName() + "has paid a total of " + repairCost + " in repair costs.");
+                player.payMoney(repairCost);
+                return true;
+            
+            case "multipass": // Get out of jail free card (The 5th Element reference)
+                return false;
+                
+            case "jail": // Currently just sending people to GoToJail location (using jump 30) [FIX!!!]
+                player.moveToPosition(99);
+                return true;
+            
             default:
-                throw new Exception("NO ACTION!");
+                System.out.println("NO ACTION!");
+                //throw new Exception("NO ACTION!");
+                break; // default will break/exit and return false
         }
+        return false;
     }
 
     private void isGameFinished() {

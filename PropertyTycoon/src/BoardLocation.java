@@ -1,6 +1,6 @@
 /**
  *
- * @author Kieran(132206)
+ * @author Kieran(132206), 146674
  *
  */
 public class BoardLocation {
@@ -121,7 +121,7 @@ public class BoardLocation {
                  break;
                  
              default:
-                 return price; // Do nothing for utility/station and other locations
+                 break; // Do nothing for utility/station and other locations (returns price by default)
          }
          return price;
      }

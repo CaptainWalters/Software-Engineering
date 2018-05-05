@@ -2,7 +2,7 @@ import java.io.IOException;
 
 /**
  *
- * @author Kieran(132206)
+ * @author Kieran(132206), 146674
  *
  */
 
@@ -19,17 +19,50 @@ public class Board {
      }
      
      //@146674
-     public int getNumberOfPropertiesOwnedByPlayer(Player player){
-         int out = 0;
-         for (BoardLocation location : board)
-             if( location.isOwned() )
-                if( location.getOwner().equals(player) )
-                    out++;
-         return out;
+     public int getNumberOfHousesDevelopedByPlayer(Player player){
+        int out = 0;
+        for (BoardLocation location : board) // Loop through board
+            if( location.isOwned() )
+               if( location.getOwner().equals(player) )
+                   out += (location.numberOfPropertiesBuilt() < 5) ? location.numberOfPropertiesBuilt():0; // Adds number of Houses and ignores Hotels
+        return out;
      }
      
      //@146674
-     public int getNumberOfPropertiesOwnedByPlayerUsingColour(Player player, String colourCheck){
+     public int getNumberOfHotelsDevelopedByPlayer(Player player){
+        int out = 0;
+        for (BoardLocation location : board) // Loop through board
+            if( location.isOwned() )
+               if( location.getOwner().equals(player) )
+                   out += (location.numberOfPropertiesBuilt() == 5) ? 1:0; // Adds one if hotel found, zero otherwise
+        return out;
+     }
+     
+     //@146674
+     public int getTotalNumberOfPropertiesDevelopedByPlayer(Player player){
+        return ( getNumberOfHousesDevelopedByPlayer(player) + getNumberOfHotelsDevelopedByPlayer(player) );
+        /* OLD, BUT RELIABLE CODE
+        int out = 0;
+        for (BoardLocation location : board)
+            if( location.isOwned() )
+               if( location.getOwner().equals(player) )
+                   out += location.numberOfPropertiesBuilt();
+        return out;
+        */
+     }
+     
+     //@146674
+     public int getNumberOfLocationsOwnedByPlayer(Player player){
+        int out = 0;
+        for (BoardLocation location : board)
+            if( location.isOwned() )
+                if( location.getOwner().equals(player) )
+                   out++;
+        return out;
+     }
+     
+     //@146674
+     public int getNumberOfLocationsOwnedByPlayerUsingColour(Player player, String colourCheck){
          int out = 0;
          for (BoardLocation location : board)
              if( location.getColour().equals(colourCheck) && location.isOwned() )

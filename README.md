@@ -8,10 +8,6 @@ takeTurn iterates through an arraylist of players, checking to see whether doubl
 
 -- Trading system
 
--- doAction(): fix stations rent payment
-
--- Pot Luck and Opportunity Knocks cards
-
 -- Go to Jail
 
 -- Jail system
@@ -19,5 +15,7 @@ takeTurn iterates through an arraylist of players, checking to see whether doubl
 -- if rent cannot be paid then mortgage or sell to bank
 
 -- bankruptcy
+
+-- Graphical Interface coming soon!(tm)
 
 MORE TO COME

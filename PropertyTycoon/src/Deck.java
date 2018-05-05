@@ -1,30 +1,31 @@
 /**
  *
- * @author Oliver
+ * @author Oliver, 146674
  *
  */
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.Queue;
 
 public class Deck {
     private Queue<Card> cardDeck;
 
     public Deck(ArrayList<Card> cards) {
-        Collections.shuffle(cards)  ;
-        for(int i=0;i<cards.size();i++) {
-            cardDeck.add(cards.get(i));
-        }
+        this.cardDeck = new LinkedList(); // instantiate new deck object
+        
+        Collections.shuffle(cards); // Shuffle cards
+        cards.forEach((card) -> {
+            addCard( card ); // Add cards to deck object
+        });
     }
 
-    public Card getNextCard() {
-        return cardDeck.remove();
+    public final Card getNextCard() {
+        return this.cardDeck.remove();
     }
 
-    public void returnCard(Card card) {
-        cardDeck.add(card);
+    public final void addCard(Card card) {
+        this.cardDeck.add(card);
     }
-
-
 }
