@@ -7,6 +7,9 @@
 import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 
 /**
  *The ClassicGame class runs an instance of the classic game of property tycoon. It is responsible for initialising
@@ -26,14 +29,16 @@ public class ClassicGame{
     PotLuck potLuck;
     OpportunityKnocks opportunityKnocks;
     Boolean gameFinished = false;
+    Boolean tradingAllowed;
 
     int currentTurn = 0;
     int roundNumber = 0;
 
-    public ClassicGame(Player[] players) throws IOException {
+    public ClassicGame(Player[] players, boolean trading) throws IOException {
         this.players = players;
         this.noOfPlayers = players.length;
         freeParking = 0;
+        tradingAllowed = trading;
         init();
         takeTurn();
     }
@@ -228,7 +233,8 @@ public class ClassicGame{
                     System.out.println("Player " + player.getPlayerName() + " now owns " + currLoc.getName());
                     System.out.println("Player " + player.getPlayerName() + " now has " + player.getMoney() + " coins");
                 } else if (n == 1) {
-                    //trade(currLoc);
+                    //doAuction(currLoc);
+                    doTrade(player);
                 }
             } else if( currLoc.isOwned() && !currLoc.getOwner().equals( player ) && currLoc.getAction().equals("") ){
                 // @146674: if square is owned and cannot be baught, force player to pay rent if not owned by themselves
@@ -238,6 +244,71 @@ public class ClassicGame{
             }
         }
     }
+
+    //@132206
+    // Creates an auction if they player declines to buy property.
+    //TODO: does not check to see if two bids are the same.
+    public void doAuction(BoardLocation currLoc){
+
+        int[] bidArr = new int[players.length];
+        Player winningPlayer = null;
+        int winningBid = 0;
+        JTextField pbid = new JTextField();
+
+        for(int i = 0; i<players.length;i++){
+            Object[] message = {currLoc.getName() + " is up for auction. " + players[i].getPlayerName() + ", please enter your bid. You only get one bid!",pbid};
+            int playerBid = JOptionPane.showConfirmDialog(null, message, "Property Auction.", JOptionPane.OK_CANCEL_OPTION);
+            if(playerBid == -1){
+                System.exit(0);
+            }
+            bidArr[i] = Integer.parseInt(pbid.getText());
+            pbid.setText("");
+        }
+
+        for(int i = 0; i<bidArr.length;i++){
+            if(bidArr[i]>winningBid){
+                winningBid = bidArr[i];
+                winningPlayer = players[i];
+            }
+        }
+
+        winningPlayer.payMoney(winningBid); // Take bid from current player
+        currLoc.setOwner(winningPlayer);
+        int bidwinMsg = JOptionPane.showConfirmDialog(null,winningPlayer.getPlayerName() + " won the bid! They now own " + currLoc.getName(), "Property Auction.", JOptionPane.OK_CANCEL_OPTION);
+
+        if(bidwinMsg == -1){
+            System.exit(0);
+        }
+    }
+
+    //@132206
+    // Creates a trade dialog for 2 players to trade a property.
+//    public void doTrade(Player currPlayer){
+//        ArrayList<String> playerProperties = new ArrayList<>();
+//
+//        for(int i = 0; i <39;i++){
+//            if(board.board[i].getOwner()==currPlayer){
+//                playerProperties.add(board.board[i].getName());
+//            }
+//        }
+//
+//
+//        Object[] pparray = playerProperties.toArray();
+//
+//        JComboBox pProperties = new JComboBox(pparray);
+//
+//        Player[] otherPlayers = players;
+//        otherPlayers.
+//
+//        JComboBox tPlayer = new JComboBox(players);
+//
+//        Object[] message = {"Please select the property you wish to trade :",pProperties ,"Select the player you wish to trade with:", tPlayer,"CPU Player?"};
+//        int option = JOptionPane.showConfirmDialog(null, message, "Trade System.", JOptionPane.OK_CANCEL_OPTION);
+//
+//        if (option == -1){
+//            System.exit(0);
+//        }
+//    }
     
     //@146674
     // Executes an action on player that landed on a location during their turn

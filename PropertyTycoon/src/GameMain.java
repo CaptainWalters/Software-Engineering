@@ -19,9 +19,13 @@ public class GameMain {
 
         //choose game type
         String[] options = new String[] {"Classic", "Abridged"};
-        int gameType = JOptionPane.showOptionDialog(null, "Please choose a game type", "Game type selection.",
+        JCheckBox checkBox1 = new JCheckBox("Allow Trading?");
+        Object[] smessage = {"Please choose a game type:", checkBox1};
+        int gameType = JOptionPane.showOptionDialog(null, smessage, "Game type selection.",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
                 img, options, options[0]);
+
+        boolean trading = checkBox1.isSelected();
 
         if(gameType == -1){
             System.exit(0);
@@ -94,9 +98,9 @@ public class GameMain {
         }
 
         if(gameType == 0){
-            ClassicGame game = new ClassicGame(players); // MODEL (Data&Logic)
+            ClassicGame game = new ClassicGame(players, trading); // MODEL (Data&Logic)
         } else if(gameType == 1){
-            AbridgedGame game = new AbridgedGame(players); // MODEL (Data&Logic)
+            AbridgedGame game = new AbridgedGame(players, trading); // MODEL (Data&Logic)
         }
 
         JFrame f = new JFrame("Player creation");

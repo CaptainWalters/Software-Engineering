@@ -5,7 +5,7 @@
  */
 public class AbridgedGame{
 
-    AbridgedGame(Player[] players) {
+    AbridgedGame(Player[] players, boolean trading) {
         System.out.println("AbridgedGame made");
     }
 
