@@ -6,6 +6,7 @@
 
 import javax.swing.*;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -234,7 +235,7 @@ public class ClassicGame{
                     System.out.println("Player " + player.getPlayerName() + " now has " + player.getMoney() + " coins");
                 } else if (n == 1) {
                     //doAuction(currLoc);
-                    doTrade(player);
+                    //doTrade(player);
                 }
             } else if( currLoc.isOwned() && !currLoc.getOwner().equals( player ) && currLoc.getAction().equals("") ){
                 // @146674: if square is owned and cannot be baught, force player to pay rent if not owned by themselves
@@ -284,6 +285,29 @@ public class ClassicGame{
     //@132206
     // Creates a trade dialog for 2 players to trade a property.
 //    public void doTrade(Player currPlayer){
+//
+//        Player otherPlayer;
+//
+//        ArrayList<Player> otherPlayers = new ArrayList(players);
+//        otherPlayers.remove(currPlayer);
+//
+//
+//
+//        String[] oPS =
+//
+//        JComboBox playerBox = new JComboBox(otherPlayers.);
+//
+//        Object[] playerSelectionMessage = {"Please select the player you wish to trade with: ",playerBox};
+//        int playerOption = JOptionPane.showConfirmDialog(null, playerSelectionMessage, "Trade System.", JOptionPane.OK_CANCEL_OPTION);
+//
+//        if(playerOption == -1){
+//            System.exit(0);
+//        }
+//
+//        otherPlayer = (Player)playerBox.getSelectedItem();
+//
+//
+//
 //        ArrayList<String> playerProperties = new ArrayList<>();
 //
 //        for(int i = 0; i <39;i++){
@@ -297,8 +321,8 @@ public class ClassicGame{
 //
 //        JComboBox pProperties = new JComboBox(pparray);
 //
-//        Player[] otherPlayers = players;
-//        otherPlayers.
+//        //Player[] otherPlayers = players;
+//
 //
 //        JComboBox tPlayer = new JComboBox(players);
 //
@@ -338,14 +362,14 @@ public class ClassicGame{
                 case "taxIncome":
                     System.out.println("Player " + player.getPlayerName() + " landed on Income Tax! Pay £200.");
                     player.payMoney( 200 ); // Player pay penality of £200 to Free Parking
-                    addFreeParking( 200 );
+                    //addFreeParking( 200 );
                     return true;
                 
                 // Super Tax
                 case "taxSuper":
                     System.out.println("Player " + player.getPlayerName() + " landed on Super Tax! Pay £100.");
-                    player.addMoney( 100 ); // Player pay penality of £100 to Free Parking
-                    addFreeParking( 100 );
+                    player.payMoney( 100 ); // Player pay penality of £100 to Free Parking
+                    //addFreeParking( 100 );
                     return true;
                     
                 // Pot Luck card action
@@ -388,13 +412,13 @@ public class ClassicGame{
                     if(!currLoc.isOwned()) break; // Break if utility location has not been purchased to pass to default case
                     if(currLoc.getOwner().equals(player)) return false; // Ignore if landlord lands on own station
                     
-                    value = 0; // Reset value
+                    value = 25; // Reset value
                     // check if player how many stations landlord owns
                     int stations = board.getNumberOfLocationsOwnedByPlayerUsingColour(currLoc.getOwner(), "station");
 
-                    if( stations == 2) value = 200;
-                    if( stations == 3) value = 300;
-                    if( stations == 3) value = 1000;
+                    if( stations == 2) value = 50;
+                    if( stations == 3) value = 100;
+                    if( stations == 4) value = 200;
                     
                     System.out.println("Player " + player.getPlayerName() + " paid " + currLoc.getOwner().getPlayerName() + " the amount of " + value + " for landing on " + currLoc.getName());
                     player.payMoney(value);
