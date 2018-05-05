@@ -6,6 +6,8 @@
 
 import javax.swing.*;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
@@ -15,16 +17,16 @@ import java.util.ArrayList;
  */
 public class ClassicGame{
 
+    Path luck = Paths.get("../res/PotLuck.csv");
+    Path knocks = Paths.get("../res/OpportunityKnocks.csv");
     private int noOfPlayers;
-
-
     Player[] players;
     Dice dice1;
     Dice dice2;
     Board board;
     int freeParking;
-    PotLuck potLuck;
-    OpportunityKnocks opportunityKnocks;
+    Deck potLuck;
+    Deck opportunityKnocks;
     Boolean gameFinished = false;
 
     int currentTurn = 0;
@@ -50,8 +52,9 @@ public class ClassicGame{
         dice1 = new Dice();
         dice2 = new Dice();
 
-        potLuck = new PotLuck();
-        opportunityKnocks = new OpportunityKnocks();
+        potLuck = new Deck(luck);
+        opportunityKnocks = new Deck(knocks);
+
 
         System.out.println("Game has been initialized");
     }
@@ -165,6 +168,21 @@ public class ClassicGame{
         if(n == -1){
             System.exit(0);
         }
+    }
+
+    private int cardDialog(Card card) {
+        int n = JOptionPane.showOptionDialog(null,
+                (card.getDescription()),
+                "Pick",
+                JOptionPane.PLAIN_MESSAGE,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                new Object[]{"Yes", "No"},
+                "Yes");
+        if(n == -1){
+            System.exit(0);
+        }
+        return n;
     }
     
     //@146674
@@ -280,12 +298,12 @@ public class ClassicGame{
                 // Pot Luck card action
                 case "doPLCard":
                     System.out.printf(player.getPlayerName() + ", Pot Luck! ");
-                    return cardAction(player, potLuck.drawCard());
+                    return cardAction(player, potLuck.drawCard(), dice);
                 
                 // Opportunity Knocks card action
                 case "doOKCard":
                     System.out.printf(player.getPlayerName() + ", Opportunity Knocks! ");
-                    return cardAction(player, opportunityKnocks.drawCard());
+                    return cardAction(player, opportunityKnocks.drawCard(), dice);
                     
                 // Go to Jail [FIX THIS!!!]
                 case "doGoToJail":
@@ -341,7 +359,7 @@ public class ClassicGame{
     }
 
     //public void cardAction(Player currPlayer, Card card) throws Exception {
-    public Boolean cardAction(Player player, Card card) {
+    public Boolean cardAction(Player player, Card card, int[] dice) {
         String action = card.getAction();
         int value = card.getValue();
         System.out.println( card.getDescription() );
@@ -351,32 +369,29 @@ public class ClassicGame{
                 player.addMoney(value);
                 return true;
             
-            case "payBank":
+            case "pay":
                 player.payMoney(value);
                 return true;
             
-            case "payFreeParking":
+            case "parking":
                 player.payMoney(value);
                 addFreeParking(value);
                 return true;
             
             case "jump":
                 player.moveToPosition(value);
-                doAction( player, rollDice() ); // Executes wherever player lands
+                doAction( player, dice ); // Executes wherever player lands
                 return true;
                 
-            case "goBack3":
+            case "move":
                 player.movePosition(-3); // Can we move back like this???
-                doAction( player, rollDice() ); // Executes wherever player lands
+                doAction( player, dice ); // Executes wherever player lands
                 return true;
             
             case "select":
                 //addMoney(Integer.parseInt(locationValue));
                 return false;
-            
-            //case "free":
-            //    addFreeParking(value);
-            //    break;
+
             case "collect":
                 int num = player.getPlayerNumber();
                 int collection = 0;
@@ -389,10 +404,6 @@ public class ClassicGame{
                     }
                 }
                 player.addMoney(collection);
-                return true;
-            
-            case "move":
-                player.movePosition(value);
                 return true;
             
             case "repair":
