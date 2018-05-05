@@ -1,6 +1,6 @@
 /**
  *
- * @author Kieran(132206)
+ * @author Kieran(132206), 146674
  *
  */
 public class BoardLocation {
@@ -16,8 +16,8 @@ public class BoardLocation {
      private int propertyType; // @146674 property type on this location (refer to rent values index for property type)
      private final String colour;
      private final String action;
-     private boolean canBuy;
-     private Player owner;
+     private boolean canBuy; // Should not be final
+     private Player owner; // Should not be final
 
      public BoardLocation(int position, String name, int value, int[] rent, String colour, String action, boolean canBuy){
          this.position = position;
@@ -83,22 +83,48 @@ public class BoardLocation {
      }
       
      //@146674
-     /*
-     public boolean doAction(Player player){
-         // does nothing yet ... (implement)
-         switch(this.action){
-             case "collectfines":
-                 break;
-             default:
-                 break;
-         }
-         return false;
-     }*/
-     // Data is now fed to ClassicGame::doAction() using value from this method
+     // Location Action is now fed to ClassicGame::doAction() using value from this method
      public String getAction(){
          return this.action;
      }
+     
+     //@146674
+     public int getHouseDevelopmentPrice(){
+         int price = 0;
+         switch( this.colour ){
+             case "brown":
+             case "blue":
+                 // House = $50
+                 // Hotel = 4xHouse + $50
+                 if( this.propertyType >= 4 ) price = 250; else price = 50;
+                 break;
 
+             case "purple":
+             case "orange":
+                 // House = $100
+                 // Hotel = 4xHouse + $100
+                 if( this.propertyType >= 4 ) price = 500; else price = 100;
+                 break;
+
+             case "red":
+             case "yellow":
+                 // House = $150
+                 // Hotel = 4xHouse + $150
+                 if( this.propertyType >= 4 ) price = 750; else price = 150;
+                 break;
+
+             case "green":
+             case "deep blue":
+                 // House = $200
+                 // Hotel = 4xHouse + $200
+                 if( this.propertyType >= 4 ) price = 1000; else price = 200;
+                 break;
+                 
+             default:
+                 break; // Do nothing for utility/station and other locations (returns price by default)
+         }
+         return price;
+     }
      
      //@146674
      public Boolean buyHouse(Player player){
@@ -106,43 +132,9 @@ public class BoardLocation {
          // check if this location is maxed out with houses
          if( this.propertyType >= 5 )
              return false;
-
-         int price = 0;
-         switch( this.colour ){
-             case "brown":
-             case "blue":
-                 // House = $50
-                 // Hotel = 4xHouse + $50
-                 if( this.propertyType == 5 ) price = 250; else price = 50;
-                 break;
-
-             case "purple":
-             case "orange":
-                 // House = $100
-                 // Hotel = 4xHouse + $100
-                 if( this.propertyType == 5 ) price = 500; else price = 100;
-                 break;
-
-             case "red":
-             case "yellow":
-                 // House = $150
-                 // Hotel = 4xHouse + $150
-                 if( this.propertyType == 5 ) price = 750; else price = 150;
-                 break;
-
-             case "green":
-             case "deep blue":
-                 // House = $200
-                 // Hotel = 4xHouse + $200
-                 if( this.propertyType == 5 ) price = 1000; else price = 200;
-                 break;
-                 
-             default:
-                 return false; // Do nothing for utility/station and card locations
-         }
          
          // Only pay the bank 
-         player.payMoney(price); // this should be checked if true (player has enough money) before incrementing
+         player.payMoney( getHouseDevelopmentPrice() ); // this should be checked if true (player has enough money) before incrementing
          this.propertyType++; // Add a house
          System.out.println("Player " + player.getPlayerName() + " has built " + this.propertyType + " house(s) on " + this.getName());
          return true;

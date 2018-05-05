@@ -5,26 +5,25 @@
 
 public class Card {
 
-    private String description;
-    private String action;
-    private String value;
+    private final String description;
+    private final String action;
+    private final int value;
 
-    public void Card(String description, String action, String value) {
+    public Card(String description, String action, int value) {
         this.description = description;
         this.action = action;
         this.value = value;
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public String getAction() {
-        return action;
+        return this.action;
     }
 
-    public String getValue() {
-        return value;
+    public int getValue() {
+        return this.value;
     }
-
 }

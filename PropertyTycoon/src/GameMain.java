@@ -1,26 +1,29 @@
 import javax.swing.*;
+
 import java.awt.*;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import static java.lang.System.in;
-
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.io.IOException;
 
 
 /**
- *
- * @author Kieran(132206)
+ * Model = GameData&Logic, View = GUI, Controller = main()
+ * MVC model where the CONTROLLER will pull data from MODEL and send the data to VIEW to render visually
+ * @author Kieran(132206), Oliver(134730), Vlad (146674)
  *
  */
 public class GameMain {
+    // THIS WHOLE FILE IS THE CONTROLLER
 
 
 
     public static void main(String[] args) throws IOException {
-        ImageIcon img = new ImageIcon("//resorces/logo.png");
+        ImageIcon img = new ImageIcon("//res/logo.png");
         int totalPlayers = 0;
         int humanPlayers = 0;
         int CPUPlayers = 0;
@@ -100,10 +103,9 @@ public class GameMain {
         }
 
         if(gameType == 0){
-            ClassicGame game = new ClassicGame(players);
-
+            ClassicGame game = new ClassicGame(players); // MODEL (Data&Logic)
         } else if(gameType == 1){
-            AbridgedGame game = new AbridgedGame(players);
+            AbridgedGame game = new AbridgedGame(players); // MODEL (Data&Logic)
         }
 
         JFrame f = new JFrame("Player creation");

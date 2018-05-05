@@ -6,16 +6,16 @@
 
 takeTurn iterates through an arraylist of players, checking to see whether doubles are thrown, if three are thrown the player goes to jail (currently space 99 on board)
 
-- trading system
+-- Trading system
 
--doAction(of card and boardlocation which are not properties.
+-- Go to Jail
 
--<strike>if property is owned doAction would be pay rent</strike> [pays automatically now @ ClassicGame::offerToBuy() ]
+-- Jail system
 
--BoardLocation: fix utilities and stations rent payment
+-- if rent cannot be paid then mortgage or sell to bank
 
--if rent cannot be paid then mortgage or sell to bank
+-- bankruptcy
 
--free parking
+-- Graphical Interface coming soon!(tm)
 
--MORE TO COME
+MORE TO COME
