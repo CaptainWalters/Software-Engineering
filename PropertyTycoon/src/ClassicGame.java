@@ -363,11 +363,11 @@ public class ClassicGame{
         for(int i = 0; i<pSelected.length;i++){
             selectedOtherPlayersProperties[i] = otherPlayerProperties.get(oSelected[i]);
         }
-
+// check the user actually selected something
         for(int i = 0; i<selectedPlayersProperties.length;i++){
             selectedPlayersProperties[i].setOwner(otherPlayer);
         }
-
+    // check the user actually selected something
         for(int i = 0; i<selectedOtherPlayersProperties.length;i++){
             selectedOtherPlayersProperties[i].setOwner(currPlayer);
         }
