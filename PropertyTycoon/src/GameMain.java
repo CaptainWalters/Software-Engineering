@@ -18,7 +18,7 @@ public class GameMain {
 
 
         //choose game type
-        String[] options = new String[] {"Classic", "Abridged"};
+        String[] options = new String[]{"Classic", "Abridged"};
         JCheckBox checkBox1 = new JCheckBox("Allow Trading?");
         Object[] smessage = {"Please choose a game type:", checkBox1};
         int gameType = JOptionPane.showOptionDialog(null, smessage, "Game type selection.",
@@ -27,24 +27,24 @@ public class GameMain {
 
         boolean trading = checkBox1.isSelected();
 
-        if(gameType == -1){
+        if (gameType == -1) {
             System.exit(0);
         }
 
         //choose how many players
-        String[] noptions = {"2","3","4","5","6"};
+        String[] noptions = {"2", "3", "4", "5", "6"};
         JComboBox noOfP = new JComboBox(noptions);
         Object[] npmessage = {"Please choose number of players:", noOfP,};
-        totalPlayers = (JOptionPane.showConfirmDialog(null, npmessage,"Number of players.",JOptionPane.OK_CANCEL_OPTION));
+        totalPlayers = (JOptionPane.showConfirmDialog(null, npmessage, "Number of players.", JOptionPane.OK_CANCEL_OPTION));
 
         totalPlayers = Integer.parseInt(noOfP.getSelectedItem().toString());
 
-        if(totalPlayers == -1){
+        if (totalPlayers == -1) {
             System.exit(0);
         }
 
         players = new Player[totalPlayers];
-        String[] cpuoptions = new String[]{"No","Yes"};
+        String[] cpuoptions = new String[]{"No", "Yes"};
         ArrayList<String> tokenoptions = new ArrayList();
         tokenoptions.add("Boot");
         tokenoptions.add("Cat");
@@ -60,53 +60,57 @@ public class GameMain {
         JComboBox token = new JComboBox(toptions);
         JComboBox cpu = new JComboBox(cpuoptions);
 
-        for(int i = 1; i<=totalPlayers;i++){
-            Object[] message = {"Enter player name:", pname,"Select a token:", token,"CPU Player?", cpu };
+
+        for (int i = 1; i <= totalPlayers; i++) {
+            Object[] message = {"Enter player name:", pname, "Select a token:", token, "CPU Player?", cpu};
             Enum etoken = Token.NotInUse;
             Boolean cpuChoice;
 
             int option = JOptionPane.showConfirmDialog(null, message, "Player details.", JOptionPane.OK_CANCEL_OPTION);
 
-            if(option == -1){
+            if (option == -1) {
                 System.exit(0);
             }
 
-            if (option == JOptionPane.OK_OPTION) {
-                if(token.getSelectedItem().equals("Boot"))
-                    etoken = Token.Boot;
-                } else if (token.getSelectedItem().equals("Hatstand")){
-                    etoken = Token.Hatstand;
-                } else if(token.getSelectedItem().equals("Spoon")) {
-                    etoken = Token.Spoon;
-                } else if (token.getSelectedItem().equals("Goblet")) {
-                    etoken = Token.Goblet;
-                } else if (token.getSelectedItem().equals("Cat")) {
-                    etoken = Token.Cat;
-                } else if (token.getSelectedItem().equals("Smartphone")){
-                    etoken = Token.Smartphone;
-                }
-
-            if(cpu.getSelectedItem().equals("Yes")){
+            if (cpu.getSelectedItem().equals("Yes")) {
                 cpuChoice = true;
             } else {
                 cpuChoice = false;
             }
 
-            players[i-1] = new Player(i,pname.getText(),etoken,cpuChoice);
-            pname.setText("");
-            token.removeItem(token.getSelectedItem());
+            if (option == 0) {
+                if (token.getSelectedItem().equals("Boot")) {
+                    etoken = Token.Boot;
+                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                } else if (token.getSelectedItem().equals("Hatstand")) {
+                    etoken = Token.Hatstand;
+                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                } else if (token.getSelectedItem().equals("Spoon")) {
+                    etoken = Token.Spoon;
+                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                } else if (token.getSelectedItem().equals("Goblet")) {
+                    etoken = Token.Goblet;
+                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                } else if (token.getSelectedItem().equals("Cat")) {
+                    etoken = Token.Cat;
+                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                } else if (token.getSelectedItem().equals("Smartphone")) {
+                    etoken = Token.Smartphone;
+                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                }
+
+                pname.setText("");
+                token.removeItem(token.getSelectedItem());
+            }
+
         }
 
-        if(gameType == 0){
-            ClassicGame game = new ClassicGame(players, trading); // MODEL (Data&Logic)
-        } else if(gameType == 1){
-            AbridgedGame game = new AbridgedGame(players, trading); // MODEL (Data&Logic)
-        }
+            if (gameType == 0) {
+                ClassicGame game = new ClassicGame(players, trading); // MODEL (Data&Logic)
+            } else if (gameType == 1) {
+                AbridgedGame game = new AbridgedGame(players, trading); // MODEL (Data&Logic)
+            }
 
-        JFrame f = new JFrame("Player creation");
-        JPanel standardPanel = new JPanel();
 
-        f.getContentPane().add(standardPanel);
-        JTextField p1 = new JTextField();
     }
 }
