@@ -1,6 +1,6 @@
 /**
  *
- * @author Oliver
+ * @author Oliver(134730)
  */
 
 public class Card {
@@ -16,14 +16,14 @@ public class Card {
     }
 
     public String getDescription() {
-        return this.description;
+        return description;
     }
 
     public String getAction() {
-        return this.action;
+        return action;
     }
 
     public int getValue() {
-        return this.value;
+        return value;
     }
 }

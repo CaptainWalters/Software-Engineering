@@ -1,12 +1,14 @@
 /**
  *
- * @author Kieran(132206), 146674
+ * @author Kieran(132206), Oliver(134730), Vlad (146674)
  *
  */
 
 import javax.swing.*;
 import java.io.IOException;
-import java.lang.reflect.Array;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.*;
 
 /**
@@ -16,14 +18,16 @@ import java.util.*;
  */
 public class ClassicGame{
 
+    final Path luck = Paths.get("../res/PotLuck.csv");
+    final Path knocks = Paths.get("../res/OpportunityKnocks.csv");
     private int noOfPlayers;
     Player[] players;
     Dice dice1;
     Dice dice2;
     Board board;
     int freeParking;
-    PotLuck potLuck;
-    OpportunityKnocks opportunityKnocks;
+    Deck potLuck;
+    Deck opportunityKnocks;
     Boolean gameFinished = false;
     Boolean tradingAllowed;
     public HashMap<Player,Integer> jailTurnCounter = new HashMap();
@@ -51,8 +55,8 @@ public class ClassicGame{
         board = new Board();
         dice1 = new Dice();
         dice2 = new Dice();
-        potLuck = new PotLuck();
-        opportunityKnocks = new OpportunityKnocks();
+        potLuck = new Deck(luck);
+        opportunityKnocks = new Deck(knocks);
     }
 
     public int[] rollDice(){
@@ -67,7 +71,7 @@ public class ClassicGame{
         // pay rent
         // check to see if player passed go
         //option for player to buy house etc.
-        // need to check if space is "Special"
+        // need to check if spaceis "Special"
         while(!gameFinished) {
             Player currPlayer = players[currentTurn];
             String playerName = currPlayer.getPlayerName();
@@ -224,6 +228,21 @@ public class ClassicGame{
         jailTurnCounter.remove(currPlayer);
         currPlayer.setOutJail();
         nextTurn(noOfPlayers);
+    }
+
+    private int cardDialog(Card card) {
+        int n = JOptionPane.showOptionDialog(null,
+                (card.getDescription()),
+                "Pick",
+                JOptionPane.PLAIN_MESSAGE,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                new Object[]{"Yes", "No"},
+                "Yes");
+        if(n == -1){
+            System.exit(0);
+        }
+        return n;
     }
     
     //@146674
@@ -518,12 +537,12 @@ public class ClassicGame{
                 // Pot Luck card action
                 case "doPLCard":
                     System.out.printf(player.getPlayerName() + ", Pot Luck! ");
-                    return cardAction(player, potLuck.drawCard());
+                    return cardAction(player, potLuck.drawCard(), dice);
                 
                 // Opportunity Knocks card action
                 case "doOKCard":
                     System.out.printf(player.getPlayerName() + ", Opportunity Knocks! ");
-                    return cardAction(player, opportunityKnocks.drawCard());
+                    return cardAction(player, opportunityKnocks.drawCard(), dice);
                     
                 // Go to Jail [FIX THIS!!!]
                 case "doGoToJail":
@@ -579,7 +598,7 @@ public class ClassicGame{
     }
 
     //public void cardAction(Player currPlayer, Card card) throws Exception {
-    public Boolean cardAction(Player player, Card card) {
+    public Boolean cardAction(Player player, Card card, int[] dice) {
         String action = card.getAction();
         int value = card.getValue();
         System.out.println( card.getDescription() );
@@ -589,32 +608,29 @@ public class ClassicGame{
                 player.addMoney(value);
                 return true;
             
-            case "payBank":
+            case "pay":
                 player.payMoney(value);
                 return true;
             
-            case "payFreeParking":
+            case "parking":
                 player.payMoney(value);
                 addFreeParking(value);
                 return true;
             
             case "jump":
                 player.moveToPosition(value);
-                doAction( player, rollDice() ); // Executes wherever player lands
+                doAction( player, dice ); // Executes wherever player lands
                 return true;
                 
-            case "goBack3":
+            case "move":
                 player.movePosition(-3); // Can we move back like this???
-                doAction( player, rollDice() ); // Executes wherever player lands
+                doAction( player, dice ); // Executes wherever player lands
                 return true;
             
             case "select":
                 //addMoney(Integer.parseInt(locationValue));
                 return false;
-            
-            //case "free":
-            //    addFreeParking(value);
-            //    break;
+
             case "collect":
                 int num = player.getPlayerNumber();
                 int collection = 0;
@@ -627,10 +643,6 @@ public class ClassicGame{
                     }
                 }
                 player.addMoney(collection);
-                return true;
-            
-            case "move":
-                player.movePosition(value);
                 return true;
             
             case "repair":
