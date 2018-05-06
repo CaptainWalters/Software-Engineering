@@ -5,7 +5,9 @@
  */
 
 import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -18,8 +20,10 @@ import java.util.*;
  */
 public class Game {
 
-    final Path luck = Paths.get("../res/PotLuck.csv");
-    final Path knocks = Paths.get("../res/OpportunityKnocks.csv");
+    URL luckURL = getClass().getResource("potluck.csv");
+    URL knocksURL = getClass().getResource("opportunityknocks.csv");
+    File luck = new File(luckURL.getPath());
+    File knocks = new File(knocksURL.getPath());
     private int noOfPlayers;
     Player[] players;
     Dice dice1;
