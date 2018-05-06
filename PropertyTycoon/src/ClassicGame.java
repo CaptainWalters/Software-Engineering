@@ -465,6 +465,7 @@ public class ClassicGame{
             for(int i = 0; i<selectedOtherPlayersProperties.length;i++){
                 selectedOtherPlayersProperties[i].setOwner(currPlayer);
             }
+
         }
 
         System.out.println("");
