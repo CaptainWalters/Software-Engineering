@@ -83,7 +83,7 @@ public class BoardLocation {
      }
       
      //@146674
-     // Location Action is now fed to ClassicGame::doAction() using value from this method
+     // Location Action is now fed to Game::doAction() using value from this method
      public String getAction(){
          return this.action;
      }

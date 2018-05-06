@@ -18,47 +18,46 @@ public class GameMain {
 
 
         //choose game type
-        String[] options = new String[] {"Classic", "Abridged"};
-        JCheckBox checkBox1 = new JCheckBox("Allow Trading?");
-        Object[] smessage = {"Please choose a game type:", checkBox1};
-        int gameType = JOptionPane.showOptionDialog(null, smessage, "Game type selection.",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
-                img, options, options[0]);
+        JCheckBox checkBox1 = new JCheckBox("Abridged?");
+        JCheckBox checkBox2 = new JCheckBox("Allow Trading?");
+        Object[] sMessage = {"Please choose a game type:", checkBox1, checkBox2};
+        int gameType = JOptionPane.showConfirmDialog(null, sMessage, "Game type selection.", JOptionPane.DEFAULT_OPTION);
 
-        boolean trading = checkBox1.isSelected();
+        boolean abridged = checkBox1.isSelected();
+        boolean trading = checkBox2.isSelected();
 
-        if(gameType == -1){
+        if(gameType == JOptionPane.CLOSED_OPTION) {
             System.exit(0);
         }
 
         //choose how many players
-        String[] noptions = {"2","3","4","5","6"};
-        JComboBox noOfP = new JComboBox(noptions);
-        Object[] npmessage = {"Please choose number of players:", noOfP,};
-        totalPlayers = (JOptionPane.showConfirmDialog(null, npmessage,"Number of players.",JOptionPane.OK_CANCEL_OPTION));
+        String[] nOptions = {"2","3","4","5","6"};
+        JComboBox noOfP = new JComboBox(nOptions);
+        Object[] npMessage = {"Please choose number of players:", noOfP,};
+        int pOptions = JOptionPane.showConfirmDialog(null, npMessage,"Number of players.",JOptionPane.DEFAULT_OPTION);
 
         totalPlayers = Integer.parseInt(noOfP.getSelectedItem().toString());
 
-        if(totalPlayers == -1){
+        if(pOptions == JOptionPane.CLOSED_OPTION) {
             System.exit(0);
         }
 
         players = new Player[totalPlayers];
-        String[] cpuoptions = new String[]{"No","Yes"};
-        ArrayList<String> tokenoptions = new ArrayList();
-        tokenoptions.add("Boot");
-        tokenoptions.add("Cat");
-        tokenoptions.add("Goblet");
-        tokenoptions.add("Hatstand");
-        tokenoptions.add("Smartphone");
-        tokenoptions.add("Spoon");
+        String[] cpuOptions = new String[]{"No","Yes"};
+        ArrayList<String> tokenOptions = new ArrayList();
+        tokenOptions.add("Boot");
+        tokenOptions.add("Cat");
+        tokenOptions.add("Goblet");
+        tokenOptions.add("Hatstand");
+        tokenOptions.add("Smartphone");
+        tokenOptions.add("Spoon");
 
         JTextField pname = new JTextField();
-        String[] toptions = new String[tokenoptions.size()];
-        tokenoptions.toArray(toptions);
+        String[] toptions = new String[tokenOptions.size()];
+        tokenOptions.toArray(toptions);
 
         JComboBox token = new JComboBox(toptions);
-        JComboBox cpu = new JComboBox(cpuoptions);
+        JComboBox cpu = new JComboBox(cpuOptions);
 
         for(int i = 1; i<=totalPlayers;i++){
             Object[] message = {"Enter player name:", pname,"Select a token:", token,"CPU Player?", cpu };
@@ -67,7 +66,7 @@ public class GameMain {
 
             int option = JOptionPane.showConfirmDialog(null, message, "Player details.", JOptionPane.OK_CANCEL_OPTION);
 
-            if(option == -1){
+            if((option == JOptionPane.CANCEL_OPTION)||(option == JOptionPane.CLOSED_OPTION)) {
                 System.exit(0);
             }
 
@@ -97,11 +96,7 @@ public class GameMain {
             token.removeItem(token.getSelectedItem());
         }
 
-        if(gameType == 0){
-            ClassicGame game = new ClassicGame(players, trading); // MODEL (Data&Logic)
-        } else if(gameType == 1){
-            AbridgedGame game = new AbridgedGame(players, trading); // MODEL (Data&Logic)
-        }
+        Game game = new Game(players, trading, abridged); // MODEL (Data&Logic)
 
         JFrame f = new JFrame("Player creation");
         JPanel standardPanel = new JPanel();
