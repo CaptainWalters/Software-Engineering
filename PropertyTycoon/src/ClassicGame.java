@@ -56,8 +56,8 @@ public class ClassicGame{
     }
 
     public int[] rollDice(){
-        int[] diceRoll = {dice1.rollDice(),dice2.rollDice()};
-        //int[] diceRoll = {1,1};
+        //int[] diceRoll = {dice1.rollDice(),dice2.rollDice()};
+        int[] diceRoll = {1,1};
         return diceRoll;
     }
 
@@ -74,7 +74,7 @@ public class ClassicGame{
             //BoardLocation currLoc = board.board[currPlayer.getPosition()]; // Not Used
 
             //1st roll
-            if(!jailCheck(currPlayer)) {
+            if(!currPlayer.inJail) {
                 rollDiceDialog(playerName + ", it is your turn. Please roll the dice.");
                 int diceRoll[] = rollDice();
                 diceRollDialog(diceRoll);
@@ -101,7 +101,7 @@ public class ClassicGame{
                         if (diceRoll[0] == diceRoll[1]) {
                             jailDialog("You rolled three doubles in a row, your going to jail!", currPlayer);
                             //SHOULD BE SENT TO JAIL NEED TO IMPLEMENT
-                            currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
+                            currPlayer.moveToPosition(99);
                             //currPlayer.moveToPosition(99);
                         } else {
                             currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
@@ -127,6 +127,9 @@ public class ClassicGame{
                     }
                     nextTurn(noOfPlayers);
                 }
+            } else {
+                payJailDialog(currPlayer);
+                nextTurn(noOfPlayers);
             }
         }
     }
@@ -193,12 +196,13 @@ public class ClassicGame{
         }
 
         jailTurnCounter.put(currPlayer,0);
+        currPlayer.setInJail();
     }
 
     private void payJailDialog(Player currPlayer) {
-        Object[] jailoptions = {"PAY, DONT PAY"};
+        Object[] jailoptions = {"PAY", "DONT PAY"};
         int n = JOptionPane.showOptionDialog(null,
-                currPlayer.getPlayerName() + " you have been in jail for " + jailTurnCounter.get(currPlayer) + " turns. Would you like to pay to get out?","Pay jail fee?",
+                currPlayer.getPlayerName() + " you are in jail. Pay 50 now or stay in jail for 2 more turns","Pay jail fee?",
                 JOptionPane.PLAIN_MESSAGE,
                 JOptionPane.QUESTION_MESSAGE,
                 null,
@@ -208,12 +212,18 @@ public class ClassicGame{
         if(n == -1){
             System.exit(0);
         }else if(n == 0){
-            currPlayer.payMoney(50);
-            jailTurnCounter.remove(currPlayer);
-            currPlayer.setOutJail();
+            payJail(currPlayer);
         } else if (n == 1){
-
+            jailCheck(currPlayer);
         }
+    }
+
+    private void payJail(Player currPlayer) {
+        currPlayer.payMoney(50);
+        freeParking+=50;
+        jailTurnCounter.remove(currPlayer);
+        currPlayer.setOutJail();
+        nextTurn(noOfPlayers);
     }
     
     //@146674
@@ -242,18 +252,14 @@ public class ClassicGame{
             jailCount = jailTurnCounter.get(currPlayer);
 
             if(jailCount == 3){
-                currPlayer.setOutJail();
                 jailTurnCounter.remove(currPlayer);
-                payJailDialog(currPlayer);
+                payJail(currPlayer);
             }else if(jailCount == 2){
                 jailTurnCounter.replace(currPlayer, 3);
-                payJailDialog(currPlayer);
             } else if (jailCount == 1){
                 jailTurnCounter.replace(currPlayer, 2);
-                payJailDialog(currPlayer);
             } else if (jailCount == 0){
                 jailTurnCounter.replace(currPlayer, 1);
-                payJailDialog(currPlayer);
             }
         }
 
@@ -311,7 +317,7 @@ public class ClassicGame{
                     doAuction(currLoc);
                     //doTrade(player);
                 }
-            } else if( currLoc.isOwned() && !currLoc.getOwner().equals( player ) && currLoc.getAction().equals("") ){
+            } else if( currLoc.isOwned() && !currLoc.getOwner().equals( player ) && currLoc.getAction().equals("") && !currLoc.getOwner().inJail ){
                 // @146674: if square is owned and cannot be baught, force player to pay rent if not owned by themselves
                 System.out.println("Player " + player.getPlayerName() + " paid " + currLoc.getOwner().getPlayerName() + " the amount of " + currLoc.getRentPrice() + " for landing on " + currLoc.getName());
                 player.payMoney( currLoc.getRentPrice() ); // Take rent money from current player
