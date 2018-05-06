@@ -1,6 +1,6 @@
 /**
  *
- * @author Oliver, 146674
+ * @author Kieran(132206), Oliver(134730), Vlad (146674)
  *
  */
 

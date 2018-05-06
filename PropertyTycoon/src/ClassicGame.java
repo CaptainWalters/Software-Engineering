@@ -1,6 +1,6 @@
 /**
  *
- * @author Kieran(132206), 146674
+ * @author Kieran(132206), Oliver(134730), Vlad (146674)
  *
  */
 
@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.*;
 
 /**
  *The ClassicGame class runs an instance of the classic game of property tycoon. It is responsible for initialising
@@ -17,8 +18,8 @@ import java.util.ArrayList;
  */
 public class ClassicGame{
 
-    Path luck = Paths.get("../res/PotLuck.csv");
-    Path knocks = Paths.get("../res/OpportunityKnocks.csv");
+    final Path luck = Paths.get("../res/PotLuck.csv");
+    final Path knocks = Paths.get("../res/OpportunityKnocks.csv");
     private int noOfPlayers;
     Player[] players;
     Dice dice1;
@@ -28,14 +29,16 @@ public class ClassicGame{
     Deck potLuck;
     Deck opportunityKnocks;
     Boolean gameFinished = false;
+    Boolean tradingAllowed;
 
     int currentTurn = 0;
     int roundNumber = 0;
 
-    public ClassicGame(Player[] players) throws IOException {
+    public ClassicGame(Player[] players, boolean trading) throws IOException {
         this.players = players;
         this.noOfPlayers = players.length;
         freeParking = 0;
+        tradingAllowed = trading;
         init();
         takeTurn();
     }
@@ -47,11 +50,8 @@ public class ClassicGame{
     public void init() throws IOException {
 
         board = new Board();
-
-
         dice1 = new Dice();
         dice2 = new Dice();
-
         potLuck = new Deck(luck);
         opportunityKnocks = new Deck(knocks);
 
@@ -70,7 +70,7 @@ public class ClassicGame{
         // pay rent
         // check to see if player passed go
         //option for player to buy house etc.
-        // need to check if space is "Special"
+        // need to check if spaceis "Special"
         while(!gameFinished) {
             Player currPlayer = players[currentTurn];
             String playerName = currPlayer.getPlayerName();
@@ -246,7 +246,8 @@ public class ClassicGame{
                     System.out.println("Player " + player.getPlayerName() + " now owns " + currLoc.getName());
                     System.out.println("Player " + player.getPlayerName() + " now has " + player.getMoney() + " coins");
                 } else if (n == 1) {
-                    //trade(currLoc);
+                    //doAuction(currLoc);
+                    doTrade(player);
                 }
             } else if( currLoc.isOwned() && !currLoc.getOwner().equals( player ) && currLoc.getAction().equals("") ){
                 // @146674: if square is owned and cannot be baught, force player to pay rent if not owned by themselves
@@ -254,6 +255,136 @@ public class ClassicGame{
                 player.payMoney( currLoc.getRentPrice() ); // Take rent money from current player
                 currLoc.getOwner().addMoney( currLoc.getRentPrice() ); // Add rent money to landlord
             }
+        }
+    }
+
+    //@132206
+    // Creates an auction if they player declines to buy property.
+    //TODO: does not check to see if two bids are the same.
+    public void doAuction(BoardLocation currLoc){
+
+        int[] bidArr = new int[players.length];
+        Player winningPlayer = null;
+        int winningBid = 0;
+        JTextField pbid = new JTextField();
+
+        for(int i = 0; i<players.length;i++){
+            Object[] message = {currLoc.getName() + " is up for auction. " + players[i].getPlayerName() + ", please enter your bid. You only get one bid!",pbid};
+            int playerBid = JOptionPane.showConfirmDialog(null, message, "Property Auction.", JOptionPane.OK_CANCEL_OPTION);
+            if(playerBid == -1){
+                System.exit(0);
+            }
+            bidArr[i] = Integer.parseInt(pbid.getText());
+            pbid.setText("");
+        }
+
+        for(int i = 0; i<bidArr.length;i++){
+            if(bidArr[i]>winningBid){
+                winningBid = bidArr[i];
+                winningPlayer = players[i];
+            }
+        }
+
+        winningPlayer.payMoney(winningBid); // Take bid from current player
+        currLoc.setOwner(winningPlayer);
+        int bidwinMsg = JOptionPane.showConfirmDialog(null,winningPlayer.getPlayerName() + " won the bid! They now own " + currLoc.getName(), "Property Auction.", JOptionPane.OK_CANCEL_OPTION);
+
+        if(bidwinMsg == -1){
+            System.exit(0);
+        }
+    }
+
+    //@132206
+    // Creates a trade dialog for 2 players to trade a property.
+    public void doTrade(Player currPlayer){
+
+        Player otherPlayer;
+
+        ArrayList<Player> otherPlayers = new ArrayList<>(Arrays.asList(players));
+        otherPlayers.remove(currPlayer);
+
+        String[] opa = new String[otherPlayers.size()];
+
+        for(int i = 0; i<otherPlayers.size();i++){
+            opa[i] = otherPlayers.get(i).getPlayerName();
+        }
+
+        JComboBox playerBox = new JComboBox(opa);
+
+        Object[] playerSelectionMessage = {"Please select the player you wish to trade with: ",playerBox};
+        int playerOption = JOptionPane.showConfirmDialog(null, playerSelectionMessage, "Trade System.", JOptionPane.OK_CANCEL_OPTION);
+
+        if(playerOption == -1){
+            System.exit(0);
+        }
+
+        otherPlayer = otherPlayers.get(playerBox.getSelectedIndex());
+
+
+
+        ArrayList<BoardLocation> playerProperties = new ArrayList<>();
+
+        for(int i = 0; i <39;i++){
+            if(board.board[i].getOwner()==currPlayer){
+                playerProperties.add(board.board[i]);
+            }
+        }
+
+        String[] playerPropertiesString = new String[playerProperties.size()];
+
+        for(int i = 0; i<playerProperties.size();i++){
+            playerPropertiesString[i] = playerProperties.get(i).getName();
+        }
+
+
+        ArrayList<BoardLocation> otherPlayerProperties = new ArrayList<>();
+
+        for(int i = 0; i <39;i++){
+            if(board.board[i].getOwner()==otherPlayer){
+                otherPlayerProperties.add(board.board[i]);
+            }
+        }
+
+        String[] otherPlayerPropertiesString = new String[otherPlayerProperties.size()];
+
+        for(int i = 0; i<otherPlayerProperties.size();i++){
+            otherPlayerPropertiesString[i] = otherPlayerProperties.get(i).getName();
+        }
+
+        JList pList = new JList(playerPropertiesString);
+        JList oList = new JList(otherPlayerPropertiesString);
+
+
+        Object[] message = {"Please select your properties that you wish to trade :",pList ,"Please select " + otherPlayer.getPlayerName() + "'s properties that you want:", oList};
+        int option = JOptionPane.showConfirmDialog(null, message, "Trade System.", JOptionPane.OK_CANCEL_OPTION);
+
+        if (option == -1){
+            System.exit(0);
+        }
+
+        int[] pSelected = pList.getSelectedIndices();
+        int[] oSelected = oList.getSelectedIndices();
+
+        BoardLocation[] selectedPlayersProperties = new BoardLocation[pSelected.length];
+        BoardLocation[] selectedOtherPlayersProperties = new BoardLocation[oSelected.length];
+
+        //playerPropeties at indexs in pSelected need to be changeOwner to otherPlayer
+        for(int i = 0; i<pSelected.length;i++){
+            selectedPlayersProperties[i] = playerProperties.get(pSelected[i]);
+        }
+
+
+        //otherPlayerProperties at indexs in oSelected need to be changeOwner to currPlayer
+        for(int i = 0; i<pSelected.length;i++){
+            selectedOtherPlayersProperties[i] = otherPlayerProperties.get(oSelected[i]);
+        }
+// check the user actually selected something
+        for(int i = 0; i<selectedPlayersProperties.length;i++){
+            selectedPlayersProperties[i].setOwner(otherPlayer);
+        }
+    // check the user actually selected something
+        for(int i = 0; i<selectedOtherPlayersProperties.length;i++){
+            selectedOtherPlayersProperties[i].setOwner(currPlayer);
         }
     }
     
@@ -285,14 +416,14 @@ public class ClassicGame{
                 case "taxIncome":
                     System.out.println("Player " + player.getPlayerName() + " landed on Income Tax! Pay £200.");
                     player.payMoney( 200 ); // Player pay penality of £200 to Free Parking
-                    addFreeParking( 200 );
+                    //addFreeParking( 200 );
                     return true;
                 
                 // Super Tax
                 case "taxSuper":
                     System.out.println("Player " + player.getPlayerName() + " landed on Super Tax! Pay £100.");
-                    player.addMoney( 100 ); // Player pay penality of £100 to Free Parking
-                    addFreeParking( 100 );
+                    player.payMoney( 100 ); // Player pay penality of £100 to Free Parking
+                    //addFreeParking( 100 );
                     return true;
                     
                 // Pot Luck card action
@@ -335,13 +466,13 @@ public class ClassicGame{
                     if(!currLoc.isOwned()) break; // Break if utility location has not been purchased to pass to default case
                     if(currLoc.getOwner().equals(player)) return false; // Ignore if landlord lands on own station
                     
-                    value = 0; // Reset value
+                    value = 25; // Reset value
                     // check if player how many stations landlord owns
                     int stations = board.getNumberOfLocationsOwnedByPlayerUsingColour(currLoc.getOwner(), "station");
 
-                    if( stations == 2) value = 200;
-                    if( stations == 3) value = 300;
-                    if( stations == 3) value = 1000;
+                    if( stations == 2) value = 50;
+                    if( stations == 3) value = 100;
+                    if( stations == 4) value = 200;
                     
                     System.out.println("Player " + player.getPlayerName() + " paid " + currLoc.getOwner().getPlayerName() + " the amount of " + value + " for landing on " + currLoc.getName());
                     player.payMoney(value);

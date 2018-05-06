@@ -2,7 +2,7 @@ import java.util.Stack;
 
 /**
  *
- * @author Kieran(132206)
+ * @author Kieran(132206), Oliver(134730), Vlad (146674)
  *
  */
 
@@ -83,7 +83,7 @@ public class Player {
         Card card;
         String action;
 
-        card = deck.getNextCard();
+        card = deck.drawCard();
         action = card.getAction();
 
         if(action.equals("keep")) {

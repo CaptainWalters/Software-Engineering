@@ -1,19 +1,9 @@
 import javax.swing.*;
-
-import java.awt.*;
-import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import static java.lang.System.in;
 import java.util.ArrayList;
-import java.util.Scanner;
-import java.io.IOException;
 
 
 /**
- * Model = GameData&Logic, View = GUI, Controller = main()
- * MVC model where the CONTROLLER will pull data from MODEL and send the data to VIEW to render visually
  * @author Kieran(132206), Oliver(134730), Vlad (146674)
  *
  */
@@ -21,27 +11,33 @@ public class GameMain {
     // THIS WHOLE FILE IS THE CONTROLLER
 
 
-
     public static void main(String[] args) throws IOException {
         ImageIcon img = new ImageIcon("//res/logo.png");
         int totalPlayers = 0;
-        int humanPlayers = 0;
-        int CPUPlayers = 0;
         Player[] players;
 
 
         //choose game type
         String[] options = new String[] {"Classic", "Abridged"};
-        int gameType = JOptionPane.showOptionDialog(null, "Please choose a game type", "Game type selection.",
+        JCheckBox checkBox1 = new JCheckBox("Allow Trading?");
+        Object[] smessage = {"Please choose a game type:", checkBox1};
+        int gameType = JOptionPane.showOptionDialog(null, smessage, "Game type selection.",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
                 img, options, options[0]);
+
+        boolean trading = checkBox1.isSelected();
 
         if(gameType == -1){
             System.exit(0);
         }
 
         //choose how many players
-        totalPlayers = Integer.parseInt((JOptionPane.showInputDialog(null, "Enter the total number of players. Max players = 6","Number of players.",JOptionPane.QUESTION_MESSAGE)));
+        String[] noptions = {"2","3","4","5","6"};
+        JComboBox noOfP = new JComboBox(noptions);
+        Object[] npmessage = {"Please choose number of players:", noOfP,};
+        totalPlayers = (JOptionPane.showConfirmDialog(null, npmessage,"Number of players.",JOptionPane.OK_CANCEL_OPTION));
+
+        totalPlayers = Integer.parseInt(noOfP.getSelectedItem().toString());
 
         if(totalPlayers == -1){
             System.exit(0);
@@ -63,7 +59,6 @@ public class GameMain {
 
         JComboBox token = new JComboBox(toptions);
         JComboBox cpu = new JComboBox(cpuoptions);
-        //Object[] message = {"Enter player name:", pname,"Select a token:", token,"CPU Player?", cpu };
 
         for(int i = 1; i<=totalPlayers;i++){
             Object[] message = {"Enter player name:", pname,"Select a token:", token,"CPU Player?", cpu };
@@ -103,9 +98,9 @@ public class GameMain {
         }
 
         if(gameType == 0){
-            ClassicGame game = new ClassicGame(players); // MODEL (Data&Logic)
+            ClassicGame game = new ClassicGame(players, trading); // MODEL (Data&Logic)
         } else if(gameType == 1){
-            AbridgedGame game = new AbridgedGame(players); // MODEL (Data&Logic)
+            AbridgedGame game = new AbridgedGame(players, trading); // MODEL (Data&Logic)
         }
 
         JFrame f = new JFrame("Player creation");
