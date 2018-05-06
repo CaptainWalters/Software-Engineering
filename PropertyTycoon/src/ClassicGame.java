@@ -5,7 +5,9 @@
  */
 
 import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -18,8 +20,11 @@ import java.util.*;
  */
 public class ClassicGame{
 
-    final Path luck = Paths.get("../res/PotLuck.csv");
-    final Path knocks = Paths.get("../res/OpportunityKnocks.csv");
+
+    URL plurl = getClass().getResource("PotLuck.csv");
+    File luck = new File(plurl.getPath());
+    URL okurl = getClass().getResource("OpportunityKnocks.csv");
+    File knock = new File(okurl.getPath());
     private int noOfPlayers;
     Player[] players;
     Dice dice1;
@@ -56,12 +61,12 @@ public class ClassicGame{
         dice1 = new Dice();
         dice2 = new Dice();
         potLuck = new Deck(luck);
-        opportunityKnocks = new Deck(knocks);
+        opportunityKnocks = new Deck(knock);
     }
 
     public int[] rollDice(){
-        //int[] diceRoll = {dice1.rollDice(),dice2.rollDice()};
-        int[] diceRoll = {1,1};
+        int[] diceRoll = {dice1.rollDice(),dice2.rollDice()};
+        //int[] diceRoll = {1,1};
         return diceRoll;
     }
 
@@ -103,9 +108,16 @@ public class ClassicGame{
                         diceRoll = rollDice();
                         diceRollDialog(diceRoll);
                         if (diceRoll[0] == diceRoll[1]) {
-                            jailDialog("You rolled three doubles in a row, your going to jail!", currPlayer);
-                            //SHOULD BE SENT TO JAIL NEED TO IMPLEMENT
+                            jailDialog("You rolled three doubles in a row, your going to jail!");
+                            int n = payJailDialog(currPlayer.getPlayerName());
+                            if(n == 0){
+                                payJail(currPlayer);
+                            } else if (n == 1){
+                                jailCheck(currPlayer);
+                            }
                             currPlayer.moveToPosition(99);
+                            jailTurnCounter.put(currPlayer,0);
+                            currPlayer.setInJail();
                             //currPlayer.moveToPosition(99);
                         } else {
                             currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
@@ -132,7 +144,7 @@ public class ClassicGame{
                     nextTurn(noOfPlayers);
                 }
             } else {
-                payJailDialog(currPlayer);
+                jailCheck(currPlayer);
                 nextTurn(noOfPlayers);
             }
         }
@@ -185,7 +197,7 @@ public class ClassicGame{
         }
     }
 
-    private void jailDialog(String message, Player currPlayer) {
+    private void jailDialog(String message) {
         Object[] jailoptions = {"DAMMIT, FINE!"};
         int n = JOptionPane.showOptionDialog(null,
                 message,"Your going to jail!",
@@ -198,15 +210,12 @@ public class ClassicGame{
         if(n == -1){
             System.exit(0);
         }
-
-        jailTurnCounter.put(currPlayer,0);
-        currPlayer.setInJail();
     }
 
-    private void payJailDialog(Player currPlayer) {
+    private int payJailDialog(String currPlayer) {
         Object[] jailoptions = {"PAY", "DONT PAY"};
         int n = JOptionPane.showOptionDialog(null,
-                currPlayer.getPlayerName() + " you are in jail. Pay 50 now or stay in jail for 2 more turns","Pay jail fee?",
+                currPlayer + " you are in jail. Pay 50 now or stay in jail for 2 more turns","Pay jail fee?",
                 JOptionPane.PLAIN_MESSAGE,
                 JOptionPane.QUESTION_MESSAGE,
                 null,
@@ -215,11 +224,9 @@ public class ClassicGame{
 
         if(n == -1){
             System.exit(0);
-        }else if(n == 0){
-            payJail(currPlayer);
-        } else if (n == 1){
-            jailCheck(currPlayer);
         }
+
+        return n;
     }
 
     private void payJail(Player currPlayer) {
@@ -263,25 +270,23 @@ public class ClassicGame{
         boolean inJail = false;
         int jailCount = 0;
 
-        if(currPlayer.inJail){
+        if(currPlayer.inJail) {
             inJail = true;
-        }
+            if (jailTurnCounter.containsKey(currPlayer)) {
+                jailCount = jailTurnCounter.get(currPlayer);
 
-        if(jailTurnCounter.containsKey(currPlayer)) {
-            jailCount = jailTurnCounter.get(currPlayer);
-
-            if(jailCount == 3){
-                jailTurnCounter.remove(currPlayer);
-                payJail(currPlayer);
-            }else if(jailCount == 2){
-                jailTurnCounter.replace(currPlayer, 3);
-            } else if (jailCount == 1){
-                jailTurnCounter.replace(currPlayer, 2);
-            } else if (jailCount == 0){
-                jailTurnCounter.replace(currPlayer, 1);
+                if (jailCount == 3) {
+                    jailTurnCounter.remove(currPlayer);
+                    payJail(currPlayer);
+                } else if (jailCount == 2) {
+                    jailTurnCounter.replace(currPlayer, 3);
+                } else if (jailCount == 1) {
+                    jailTurnCounter.replace(currPlayer, 2);
+                } else if (jailCount == 0) {
+                    jailTurnCounter.replace(currPlayer, 1);
+                }
             }
         }
-
 
         return inJail;
     }

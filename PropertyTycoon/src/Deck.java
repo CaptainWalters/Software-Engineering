@@ -16,10 +16,12 @@ import java.util.Queue;
 public class Deck {
     private Queue<Card> cardDeck;
 
-    public Deck(Path path){
+    public Deck(File file){
+        BufferedReader br = null;
         cardDeck = new LinkedList(); // instantiate new deck object
         ArrayList<Card> cards = new ArrayList<>();
-        try(BufferedReader br = Files.newBufferedReader(path)) {
+        try{
+            br = new BufferedReader(new FileReader(file));
             String line = br.readLine();
             while (line != null) {
                 String[] attributes = line.split(",");
@@ -32,7 +34,7 @@ public class Deck {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            throw new Error("Deck location invalid");
+            //throw new Error("Deck location invalid");
         }
 
         Collections.shuffle(cards); // Shuffle cards
