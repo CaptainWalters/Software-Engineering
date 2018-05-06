@@ -20,10 +20,8 @@ import java.util.*;
  */
 public class Game {
 
-    URL luckURL = getClass().getResource("potluck.csv");
-    URL knocksURL = getClass().getResource("opportunityknocks.csv");
-    File luck = new File(luckURL.getPath());
-    File knocks = new File(knocksURL.getPath());
+    File luck = new File(getClass().getResource("PotLuck.csv").getPath());
+    File knocks = new File(getClass().getResource("OpportunityKnocks.csv").getPath());
     private int noOfPlayers;
     Player[] players;
     Dice dice1;

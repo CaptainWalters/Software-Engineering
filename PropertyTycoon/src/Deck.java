@@ -5,6 +5,7 @@
  */
 
 import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -16,10 +17,12 @@ import java.util.Queue;
 public class Deck {
     private Queue<Card> cardDeck;
 
-    public Deck(Path path){
+    public Deck(File file){
         cardDeck = new LinkedList(); // instantiate new deck object
         ArrayList<Card> cards = new ArrayList<>();
-        try(BufferedReader br = Files.newBufferedReader(path)) {
+        BufferedReader br;
+        try {
+            br = new BufferedReader(new FileReader(file));
             String line = br.readLine();
             while (line != null) {
                 String[] attributes = line.split(",");
@@ -30,9 +33,10 @@ public class Deck {
                 cards.add(card);
                 line = br.readLine();
             }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-            throw new Error("Deck location invalid");
         }
 
         Collections.shuffle(cards); // Shuffle cards
@@ -42,11 +46,11 @@ public class Deck {
 
     }
 
-    public final Card drawCard() {
+    public Card drawCard() {
         return cardDeck.remove();
     }
 
-    public final void addCard(Card card) {
+    public void addCard(Card card) {
         cardDeck.add(card);
     }
 }
