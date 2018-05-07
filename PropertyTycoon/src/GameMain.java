@@ -23,10 +23,12 @@ public class GameMain {
         Object[] sMessage = {"Please choose a game type:", checkBox1, checkBox2};
         int gameType = JOptionPane.showConfirmDialog(null, sMessage, "Game type selection.", JOptionPane.DEFAULT_OPTION);
 
+
         boolean abridged = checkBox1.isSelected();
         boolean trading = checkBox2.isSelected();
 
         if(gameType == JOptionPane.CLOSED_OPTION) {
+
             System.exit(0);
         }
 
@@ -59,8 +61,9 @@ public class GameMain {
         JComboBox token = new JComboBox(toptions);
         JComboBox cpu = new JComboBox(cpuOptions);
 
-        for(int i = 1; i<=totalPlayers;i++){
-            Object[] message = {"Enter player name:", pname,"Select a token:", token,"CPU Player?", cpu };
+
+        for (int i = 1; i <= totalPlayers; i++) {
+            Object[] message = {"Enter player name:", pname, "Select a token:", token, "CPU Player?", cpu};
             Enum etoken = Token.NotInUse;
             Boolean cpuChoice;
 
@@ -70,38 +73,40 @@ public class GameMain {
                 System.exit(0);
             }
 
-            if (option == JOptionPane.OK_OPTION) {
-                if(token.getSelectedItem().equals("Boot"))
-                    etoken = Token.Boot;
-                } else if (token.getSelectedItem().equals("Hatstand")){
-                    etoken = Token.Hatstand;
-                } else if(token.getSelectedItem().equals("Spoon")) {
-                    etoken = Token.Spoon;
-                } else if (token.getSelectedItem().equals("Goblet")) {
-                    etoken = Token.Goblet;
-                } else if (token.getSelectedItem().equals("Cat")) {
-                    etoken = Token.Cat;
-                } else if (token.getSelectedItem().equals("Smartphone")){
-                    etoken = Token.Smartphone;
-                }
-
-            if(cpu.getSelectedItem().equals("Yes")){
+            if (cpu.getSelectedItem().equals("Yes")) {
                 cpuChoice = true;
             } else {
                 cpuChoice = false;
             }
 
-            players[i-1] = new Player(i,pname.getText(),etoken,cpuChoice);
-            pname.setText("");
-            token.removeItem(token.getSelectedItem());
+            if (option == 0) {
+                if (token.getSelectedItem().equals("Boot")) {
+                    etoken = Token.Boot;
+                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                } else if (token.getSelectedItem().equals("Hatstand")) {
+                    etoken = Token.Hatstand;
+                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                } else if (token.getSelectedItem().equals("Spoon")) {
+                    etoken = Token.Spoon;
+                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                } else if (token.getSelectedItem().equals("Goblet")) {
+                    etoken = Token.Goblet;
+                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                } else if (token.getSelectedItem().equals("Cat")) {
+                    etoken = Token.Cat;
+                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                } else if (token.getSelectedItem().equals("Smartphone")) {
+                    etoken = Token.Smartphone;
+                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                }
+
+                pname.setText("");
+                token.removeItem(token.getSelectedItem());
+            }
+
         }
 
         Game game = new Game(players, trading, abridged); // MODEL (Data&Logic)
 
-        JFrame f = new JFrame("Player creation");
-        JPanel standardPanel = new JPanel();
-
-        f.getContentPane().add(standardPanel);
-        JTextField p1 = new JTextField();
     }
 }
