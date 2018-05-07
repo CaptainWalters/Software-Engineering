@@ -12,17 +12,14 @@ import java.util.ArrayList;
 import java.util.*;
 
 /**
- *The ClassicGame class runs an instance of the classic game of property tycoon. It is responsible for initialising
+ *The Game class runs an instance of the classic game of property tycoon. It is responsible for initialising
  * the board, players, dice and cards.
  *
  */
-public class ClassicGame{
+public class Game {
 
-
-    URL plurl = getClass().getResource("PotLuck.csv");
-    File luck = new File(plurl.getPath());
-    URL okurl = getClass().getResource("OpportunityKnocks.csv");
-    File knock = new File(okurl.getPath());
+    File luck = new File(getClass().getResource("PotLuck.csv").getPath());
+    File knocks = new File(getClass().getResource("OpportunityKnocks.csv").getPath());
     private int noOfPlayers;
     Player[] players;
     Dice dice1;
@@ -41,7 +38,7 @@ public class ClassicGame{
     int currentTurn = 0;
     int roundNumber = 0;
 
-    public ClassicGame(Player[] players, boolean trading) throws IOException {
+    public Game(Player[] players, boolean trading, boolean abridged) throws IOException {
         this.players = players;
         this.noOfPlayers = players.length;
         freeParking = 0;
@@ -59,7 +56,7 @@ public class ClassicGame{
         dice1 = new Dice();
         dice2 = new Dice();
         potLuck = new Deck(luck);
-        opportunityKnocks = new Deck(knock);
+        opportunityKnocks = new Deck(knocks);
     }
 
     public int[] rollDice(){

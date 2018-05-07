@@ -1,16 +1,16 @@
-"""Bank pays you divided of £50""",get,50
-"""You have won a lip sync battle. Collect £100""",get,100
-"""Advance to Turing Heights""",jump,39
-"""Advance to Han Xin Gardens. If you pass GO, collect £200""",jump,24
-"""Fined £15 for speeding""",free,15
-"""Pay university fees of £150""",pay,150
-"""Take a trip to Hove station. If you pass GO collect £200""",jump,15
-"""Loan matures, collect £150""",get,150
-"""You are assessed for repairs, £40/house, £115/hotel""",repair,40
-"""Advance to GO""",jump,0
-"""You are assessed for repairs, £25/house, £100/hotel""",repair,25
-"""Go back 3 spaces""",move,-3
-"""Advance to Skywalker Drive. If you pass GO collect £200""",jump,11
-"""Go to jail. Do not pass GO, do not collect £200""",jump,99
-"""Drunk in charge of a skateboard. Fine £20""",pay,20
-"""Get out of jail free""",multipass,2
+ï»¿Bank pays you divided of Â£50,get,50
+You have won a lip sync battle. Collect Â£100,get,100
+Advance to Turing Heights,jump,39
+Advance to Han Xin Gardens. If you pass GO; collect Â£200,jump,24
+Fined Â£15 for speeding,free,15
+Pay university fees of Â£150,pay,150
+Take a trip to Hove station. If you pass GO collect Â£200,jump,15
+Loan matures; collect Â£150,get,150
+You are assessed for repairs; Â£40/house; Â£115/hotel,repair,40
+Advance to GO,jump,0
+You are assessed for repairs; Â£25/house; Â£100/hotel,repair,25
+Go back 3 spaces,move,-3
+Advance to Skywalker Drive. If you pass GO collect Â£200,jump,11
+Go to jail. Do not pass GO;  do not collect Â£200,jump,99
+Drunk in charge of a skateboard. Fine Â£20,pay,20
+Get out of jail free,multipass,2
