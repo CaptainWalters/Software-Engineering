@@ -5,9 +5,6 @@
  */
 
 import java.io.*;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -19,6 +16,14 @@ public class Deck {
 
     public Deck(File file){
         cardDeck = new LinkedList(); // instantiate new deck object
+        ArrayList<Card> cards = buildDeck(file);
+        cards = shuffle(cards); // Shuffle cards
+        for (Card card : cards) {
+            addCard(card);
+        }
+    }
+
+    ArrayList<Card> buildDeck(File file) {
         ArrayList<Card> cards = new ArrayList<>();
         BufferedReader br;
         try {
@@ -38,12 +43,12 @@ public class Deck {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return cards;
+    }
 
+    public ArrayList<Card> shuffle(ArrayList<Card> cards) {
         Collections.shuffle(cards); // Shuffle cards
-        for (Card card : cards) {
-            addCard(card);
-        }
-
+        return cards;
     }
 
     public Card drawCard() {
