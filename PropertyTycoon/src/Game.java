@@ -8,8 +8,6 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.*;
 
@@ -32,6 +30,10 @@ public class Game {
     Deck opportunityKnocks;
     Boolean gameFinished = false;
     Boolean tradingAllowed;
+    Boolean allPlayersPassedGo = false;
+    public HashMap<Player,Integer> jailTurnCounter = new HashMap();
+
+
 
     int currentTurn = 0;
     int roundNumber = 0;
@@ -50,19 +52,23 @@ public class Game {
      * @throws IOException
      */
     public void init() throws IOException {
-
         board = new Board();
         dice1 = new Dice();
         dice2 = new Dice();
         potLuck = new Deck(luck);
         opportunityKnocks = new Deck(knocks);
-
-
-        System.out.println("Game has been initialized");
     }
 
     public int[] rollDice(){
+        //int[] diceRoll = {dice1.rollDice(),dice2.rollDice()};
         int[] diceRoll = {dice1.rollDice(),dice2.rollDice()};
+//        if(players[currentTurn].getPlayerName().equals("Kieran")){
+//            diceRoll[0] = 1;
+//            diceRoll[1] = 1;
+//        } else {
+//            diceRoll[0] = dice1.rollDice();
+//            diceRoll[1] = dice2.rollDice();
+//        }
         return diceRoll;
     }
 
@@ -73,57 +79,100 @@ public class Game {
         // check to see if player passed go
         //option for player to buy house etc.
         // need to check if spaceis "Special"
+
         while(!gameFinished) {
             Player currPlayer = players[currentTurn];
             String playerName = currPlayer.getPlayerName();
-            //BoardLocation currLoc = board.board[currPlayer.getPosition()]; // Not Used
 
             //1st roll
-            rollDiceDialog(playerName + ", it is your turn. Please roll the dice.");
-            int diceRoll[] = rollDice();
-            diceRollDialog(diceRoll);
-            currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
-
-            //@146674: Execute board location action on player
-            doAction(currPlayer, diceRoll);
-
-            //Check to see if player has rolled doubles.
-            if (diceRoll[0] == diceRoll[1]) {
-                rollDiceDialog("You rolled doubles. Please roll again");
-                diceRoll = rollDice();
+            if(!currPlayer.inJail) {
+                rollDiceDialog(playerName + ", it is your turn. Please roll the dice.");
+                int diceRoll[] = rollDice();
                 diceRollDialog(diceRoll);
                 currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
-
                 //@146674: Execute board location action on player
                 doAction(currPlayer, diceRoll);
-            
-                //Check to see if player rolled doubles again
+                //Check to see if player has rolled doubles.
                 if (diceRoll[0] == diceRoll[1]) {
-                    rollDiceDialog("You rolled doubles again. Roll again. If you get doubles you will go to jail.");
+                    rollDiceDialog("You rolled doubles. Please roll again");
                     diceRoll = rollDice();
                     diceRollDialog(diceRoll);
+                    currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
+                    //@146674: Execute board location action on player
+                    doAction(currPlayer, diceRoll);
+                    //Check to see if player rolled doubles again
                     if (diceRoll[0] == diceRoll[1]) {
-                        jailDialog("You rolled three doubles in a row, your going to jail!");
-                        //SHOULD BE SENT TO JAIL NEED TO IMPLEMENT
-                        currPlayer.movePosition(diceRoll[0]+diceRoll[1]);
-                        //currPlayer.moveToPosition(99);
+                        rollDiceDialog("You rolled doubles again. Roll again. If you get doubles you will go to jail.");
+                        diceRoll = rollDice();
+                        diceRollDialog(diceRoll);
+                        if (diceRoll[0] == diceRoll[1]) {
+                            jailDialog("You rolled three doubles in a row, your going to jail!");
+                            if(!currPlayer.heldCards.empty()){
+                                Card card = currPlayer.heldCards.pop();
+                                if(card.getValue()==1){
+                                    potLuck.addCard(card);
+                                } else if(card.getValue()==2){
+                                    opportunityKnocks.addCard(card);
+                                }
+                                System.out.println(currPlayer.getPlayerName() + " used their get out of jail free card.");
+                                currPlayer.inJail = false;
+                                currPlayer.moveToPosition(10);
+                                nextTurn(noOfPlayers);
+                            } else {
+                                int n = payJailDialog(currPlayer.getPlayerName());
+                                if (n == 0) {
+                                    payJail(currPlayer, 50);
+                                } else if (n == 1) {
+                                    jailTurnCounter.put(currPlayer, 0);
+                                    currPlayer.moveToPosition(99);
+                                    currPlayer.setInJail();
+                                }
+                            }
+                        } else {
+                            currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
+                            //@146674: Execute board location action on player
+                            doAction(currPlayer, diceRoll);
+                            //Check space
+                            if (tradingAllowed) {
+                                tradeDialog(currPlayer);
+                            }
+                            nextTurn(noOfPlayers);
+                        }
                     } else {
-                        currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
-                        
-                        //@146674: Execute board location action on player
-                        doAction(currPlayer, diceRoll);
-                        
-                        //Check space
+                        if (tradingAllowed) {
+                            tradeDialog(currPlayer);
+                        }
                         nextTurn(noOfPlayers);
                     }
                 } else {
+                    if (tradingAllowed) {
+                        tradeDialog(currPlayer);
+                    }
                     nextTurn(noOfPlayers);
                 }
             } else {
+                jailCheck(currPlayer);
                 nextTurn(noOfPlayers);
             }
-            //updateRoundNumber();
-            //isGameFinished();
+        }
+    }
+
+    private void tradeDialog(Player currPlayer) {
+        if(allPlayersPassedGo){
+            Object[] okoptions = {"END TURN","TRADE"};
+            int n = JOptionPane.showOptionDialog(null,
+                    (currPlayer.getPlayerName() + " would you like to trade or end your turn."),"Dice Roll",
+                    JOptionPane.PLAIN_MESSAGE,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    okoptions,
+                    okoptions[0]);
+
+            if(n == -1){
+                System.exit(0);
+            } else if (n==1){
+                doTrade(currPlayer);
+            }
         }
     }
 
@@ -172,6 +221,32 @@ public class Game {
         }
     }
 
+    private int payJailDialog(String currPlayer) {
+        Object[] jailoptions = {"PAY", "DONT PAY"};
+        int n = JOptionPane.showOptionDialog(null,
+                currPlayer + " you are in jail. Pay 50 now or stay in jail for 2 more turns","Pay jail fee?",
+                JOptionPane.PLAIN_MESSAGE,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                jailoptions,
+                jailoptions[0]);
+
+        if(n == -1){
+            System.exit(0);
+        }
+
+        return n;
+    }
+
+    private void payJail(Player currPlayer, int value) {
+        currPlayer.payMoney(value);
+        freeParking+=value;
+        jailTurnCounter.remove(currPlayer);
+        currPlayer.setOutJail();
+        currPlayer.moveToPosition(10);
+        nextTurn(noOfPlayers);
+    }
+
     private int cardDialog(Card card) {
         int n = JOptionPane.showOptionDialog(null,
                 (card.getDescription()),
@@ -199,7 +274,29 @@ public class Game {
             new Object[]{"Yes", "No"},
             "Yes");
     }
-    
+
+    //@132206
+    private boolean jailCheck(Player currPlayer){
+        boolean inJail = false;
+        int jailCount = 0;
+        if(currPlayer.inJail) {
+            inJail = true;
+            if (jailTurnCounter.containsKey(currPlayer)) {
+                jailCount = jailTurnCounter.get(currPlayer);
+                if (jailCount == 3) {
+                    payJail(currPlayer,0);
+                } else if (jailCount == 2) {
+                    jailTurnCounter.replace(currPlayer, 3);
+                } else if (jailCount == 1) {
+                    jailTurnCounter.replace(currPlayer, 2);
+                } else if (jailCount == 0) {
+                    jailTurnCounter.replace(currPlayer, 1);
+                }
+            }
+        }
+        return inJail;
+    }
+
     //@146674
     private void developLocation(Player player){
         // Method to offer player if they would like to purchase houses/hotel when all locations on colour are owned
@@ -248,10 +345,9 @@ public class Game {
                     System.out.println("Player " + player.getPlayerName() + " now owns " + currLoc.getName());
                     System.out.println("Player " + player.getPlayerName() + " now has " + player.getMoney() + " coins");
                 } else if (n == 1) {
-                    //doAuction(currLoc);
-                    doTrade(player);
+                    doAuction(currLoc);
                 }
-            } else if( currLoc.isOwned() && !currLoc.getOwner().equals( player ) && currLoc.getAction().equals("") ){
+            } else if( currLoc.isOwned() && !currLoc.getOwner().equals( player ) && currLoc.getAction().equals("") && !currLoc.getOwner().inJail ){
                 // @146674: if square is owned and cannot be baught, force player to pay rent if not owned by themselves
                 System.out.println("Player " + player.getPlayerName() + " paid " + currLoc.getOwner().getPlayerName() + " the amount of " + currLoc.getRentPrice() + " for landing on " + currLoc.getName());
                 player.payMoney( currLoc.getRentPrice() ); // Take rent money from current player
@@ -264,35 +360,57 @@ public class Game {
     // Creates an auction if they player declines to buy property.
     //TODO: does not check to see if two bids are the same.
     public void doAuction(BoardLocation currLoc){
+        if(players.length>2) {
+            if (allPlayersPassedGo) {
+                int[] bidArr = new int[players.length];
+                Player winningPlayer = null;
+                int winningBid = 0;
+                int dupBid = 0;
+                JTextField pbid = new JTextField();
 
-        int[] bidArr = new int[players.length];
-        Player winningPlayer = null;
-        int winningBid = 0;
-        JTextField pbid = new JTextField();
+                for (int i = 0; i < players.length; i++) {
+                    if (!players[i].inJail) {
+                        Object[] message = {currLoc.getName() + " is up for auction. " + players[i].getPlayerName() + ", please enter your bid. You only get one bid!", pbid};
+                        int playerBid = JOptionPane.showConfirmDialog(null, message, "Property Auction.", JOptionPane.OK_CANCEL_OPTION);
+                        if (playerBid == -1) {
+                            System.exit(0);
+                        } else if (playerBid == 1) {
+                            doAuction(currLoc);
+                        }
+                        bidArr[i] = Integer.parseInt(pbid.getText());
+                        pbid.setText("");
+                    } else {
+                        bidArr[i] = 0;
+                    }
+                }
 
-        for(int i = 0; i<players.length;i++){
-            Object[] message = {currLoc.getName() + " is up for auction. " + players[i].getPlayerName() + ", please enter your bid. You only get one bid!",pbid};
-            int playerBid = JOptionPane.showConfirmDialog(null, message, "Property Auction.", JOptionPane.OK_CANCEL_OPTION);
-            if(playerBid == -1){
-                System.exit(0);
+                for (int i = 0; i < bidArr.length; i++) {
+                    if (bidArr[i] > winningBid) {
+                        winningBid = bidArr[i];
+                        winningPlayer = players[i];
+                    } else if (bidArr[i] == winningBid) {
+                        dupBid = winningBid;
+                    }
+                }
+
+                if (winningBid == dupBid) {
+                    int playerBid = JOptionPane.showConfirmDialog(null, "Two or more people entered the same highest bid. Please re-bid.", "Property Auction.", JOptionPane.OK_CANCEL_OPTION);
+                    doAuction(currLoc);
+
+                    if (playerBid == -1) {
+                        System.exit(0);
+                    }
+                }
+
+
+                winningPlayer.payMoney(winningBid); // Take bid from current player
+                currLoc.setOwner(winningPlayer);
+                int bidwinMsg = JOptionPane.showConfirmDialog(null, winningPlayer.getPlayerName() + " won the bid! They now own " + currLoc.getName(), "Property Auction.", JOptionPane.OK_CANCEL_OPTION);
+
+                if (bidwinMsg == -1) {
+                    System.exit(0);
+                }
             }
-            bidArr[i] = Integer.parseInt(pbid.getText());
-            pbid.setText("");
-        }
-
-        for(int i = 0; i<bidArr.length;i++){
-            if(bidArr[i]>winningBid){
-                winningBid = bidArr[i];
-                winningPlayer = players[i];
-            }
-        }
-
-        winningPlayer.payMoney(winningBid); // Take bid from current player
-        currLoc.setOwner(winningPlayer);
-        int bidwinMsg = JOptionPane.showConfirmDialog(null,winningPlayer.getPlayerName() + " won the bid! They now own " + currLoc.getName(), "Property Auction.", JOptionPane.OK_CANCEL_OPTION);
-
-        if(bidwinMsg == -1){
-            System.exit(0);
         }
     }
 
@@ -305,88 +423,103 @@ public class Game {
         ArrayList<Player> otherPlayers = new ArrayList<>(Arrays.asList(players));
         otherPlayers.remove(currPlayer);
 
-        String[] opa = new String[otherPlayers.size()];
 
+        //remove inJail players from array.
         for(int i = 0; i<otherPlayers.size();i++){
-            opa[i] = otherPlayers.get(i).getPlayerName();
-        }
-
-        JComboBox playerBox = new JComboBox(opa);
-
-        Object[] playerSelectionMessage = {"Please select the player you wish to trade with: ",playerBox};
-        int playerOption = JOptionPane.showConfirmDialog(null, playerSelectionMessage, "Trade System.", JOptionPane.OK_CANCEL_OPTION);
-
-        if(playerOption == -1){
-            System.exit(0);
-        }
-
-        otherPlayer = otherPlayers.get(playerBox.getSelectedIndex());
-
-
-
-        ArrayList<BoardLocation> playerProperties = new ArrayList<>();
-
-        for(int i = 0; i <39;i++){
-            if(board.board[i].getOwner()==currPlayer){
-                playerProperties.add(board.board[i]);
+            if(otherPlayers.get(i).inJail){
+                otherPlayers.remove(i);
             }
         }
 
-        String[] playerPropertiesString = new String[playerProperties.size()];
+        if(otherPlayers.size()>0) {
+            String[] opa = new String[otherPlayers.size()];
 
-        for(int i = 0; i<playerProperties.size();i++){
-            playerPropertiesString[i] = playerProperties.get(i).getName();
-        }
-
-
-        ArrayList<BoardLocation> otherPlayerProperties = new ArrayList<>();
-
-        for(int i = 0; i <39;i++){
-            if(board.board[i].getOwner()==otherPlayer){
-                otherPlayerProperties.add(board.board[i]);
+            for (int i = 0; i < otherPlayers.size(); i++) {
+                opa[i] = otherPlayers.get(i).getPlayerName();
             }
-        }
 
-        String[] otherPlayerPropertiesString = new String[otherPlayerProperties.size()];
+            JComboBox playerBox = new JComboBox(opa);
 
-        for(int i = 0; i<otherPlayerProperties.size();i++){
-            otherPlayerPropertiesString[i] = otherPlayerProperties.get(i).getName();
-        }
+            Object[] playerSelectionMessage = {"Please select the player you wish to trade with: ", playerBox};
+            int playerOption = JOptionPane.showConfirmDialog(null, playerSelectionMessage, "Trade System.", JOptionPane.OK_CANCEL_OPTION);
 
-        JList pList = new JList(playerPropertiesString);
-        JList oList = new JList(otherPlayerPropertiesString);
+            if (playerOption == -1) {
+                System.exit(0);
+            }
 
-
-        Object[] message = {"Please select your properties that you wish to trade :",pList ,"Please select " + otherPlayer.getPlayerName() + "'s properties that you want:", oList};
-        int option = JOptionPane.showConfirmDialog(null, message, "Trade System.", JOptionPane.OK_CANCEL_OPTION);
-
-        if (option == -1){
-            System.exit(0);
-        }
-
-        int[] pSelected = pList.getSelectedIndices();
-        int[] oSelected = oList.getSelectedIndices();
-
-        BoardLocation[] selectedPlayersProperties = new BoardLocation[pSelected.length];
-        BoardLocation[] selectedOtherPlayersProperties = new BoardLocation[oSelected.length];
-
-        //playerPropeties at indexs in pSelected need to be changeOwner to otherPlayer
-        for(int i = 0; i<pSelected.length;i++){
-            selectedPlayersProperties[i] = playerProperties.get(pSelected[i]);
-        }
+            otherPlayer = otherPlayers.get(playerBox.getSelectedIndex());
 
 
-        //otherPlayerProperties at indexs in oSelected need to be changeOwner to currPlayer
-        for(int i = 0; i<pSelected.length;i++){
-            selectedOtherPlayersProperties[i] = otherPlayerProperties.get(oSelected[i]);
-        }
-// check the user actually selected something
-        for(int i = 0; i<selectedPlayersProperties.length;i++){
-            selectedPlayersProperties[i].setOwner(otherPlayer);
-        }
-    // check the user actually selected something
-        for(int i = 0; i<selectedOtherPlayersProperties.length;i++){
-            selectedOtherPlayersProperties[i].setOwner(currPlayer);
+            ArrayList<BoardLocation> playerProperties = new ArrayList<>();
+
+            for (int i = 0; i < 39; i++) {
+                if (board.board[i].getOwner() == currPlayer) {
+                    playerProperties.add(board.board[i]);
+                }
+            }
+
+            String[] playerPropertiesString = new String[playerProperties.size()];
+
+            for (int i = 0; i < playerProperties.size(); i++) {
+                playerPropertiesString[i] = playerProperties.get(i).getName();
+            }
+
+
+            ArrayList<BoardLocation> otherPlayerProperties = new ArrayList<>();
+
+            for (int i = 0; i < 39; i++) {
+                if (board.board[i].getOwner() == otherPlayer) {
+                    otherPlayerProperties.add(board.board[i]);
+                }
+            }
+
+            String[] otherPlayerPropertiesString = new String[otherPlayerProperties.size()];
+
+            for (int i = 0; i < otherPlayerProperties.size(); i++) {
+                otherPlayerPropertiesString[i] = otherPlayerProperties.get(i).getName();
+            }
+
+            JList pList = new JList(playerPropertiesString);
+            JList oList = new JList(otherPlayerPropertiesString);
+
+
+            Object[] message = {"Please select your properties that you wish to trade :", pList, "Please select " + otherPlayer.getPlayerName() + "'s properties that you want:", oList};
+            int option = JOptionPane.showConfirmDialog(null, message, "Trade System.", JOptionPane.OK_CANCEL_OPTION);
+
+            if (option == -1) {
+                System.exit(0);
+            }
+
+            int[] pSelected = pList.getSelectedIndices();
+            int[] oSelected = oList.getSelectedIndices();
+
+            BoardLocation[] selectedPlayersProperties = new BoardLocation[pSelected.length];
+            BoardLocation[] selectedOtherPlayersProperties = new BoardLocation[oSelected.length];
+
+            //swapping properties for current player
+            if (pSelected.length > 0) {
+                for (int i = 0; i < pSelected.length; i++) {
+                    selectedPlayersProperties[i] = playerProperties.get(pSelected[i]);
+                }
+
+                for (int i = 0; i < selectedPlayersProperties.length; i++) {
+                    selectedPlayersProperties[i].setOwner(otherPlayer);
+                }
+            }
+
+            //Swapping properties for other player
+            if (oSelected.length > 0) {
+                for (int i = 0; i < oSelected.length; i++) {
+                    selectedOtherPlayersProperties[i] = otherPlayerProperties.get(oSelected[i]);
+                }
+
+                for (int i = 0; i < selectedOtherPlayersProperties.length; i++) {
+                    selectedOtherPlayersProperties[i].setOwner(currPlayer);
+                }
+
+            }
+        } else {
+            System.out.println("There is no-one to trade with.");
         }
     }
     
@@ -506,14 +639,14 @@ public class Game {
                 player.payMoney(value);
                 return true;
             
-            case "parking":
+            case "free":
                 player.payMoney(value);
                 addFreeParking(value);
                 return true;
             
             case "jump":
                 player.moveToPosition(value);
-                doAction( player, dice ); // Executes wherever player lands
+                //doAction( player, dice ); // Executes wherever player lands
                 return true;
                 
             case "move":
@@ -555,10 +688,11 @@ public class Game {
                 
             case "jail": // Currently just sending people to GoToJail location (using jump 30) [FIX!!!]
                 player.moveToPosition(99);
+                player.setInJail();
                 return true;
             
             default:
-                System.out.println("NO ACTION!");
+                System.out.println("NO ACTION!" + action);
                 //throw new Exception("NO ACTION!");
                 break; // default will break/exit and return false
         }
@@ -584,6 +718,15 @@ public class Game {
 
         if(this.currentTurn>noOfPlayers-1) {
             this.currentTurn = this.currentTurn % noOfPlayers;
+        }
+
+        if(!allPlayersPassedGo){
+            allPlayersPassedGo = true;
+            for(int i = 0; i<players.length;i++){
+                if(!players[i].passedGo&&allPlayersPassedGo){
+                    allPlayersPassedGo = false;
+                }
+            }
         }
     }
 

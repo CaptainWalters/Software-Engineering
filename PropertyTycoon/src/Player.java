@@ -16,6 +16,7 @@ public class Player {
     boolean passedGo;
     int position;
     Stack<Card> heldCards;
+    boolean inJail;
 
 
     public Player(int playerNo, String playerName, Enum token, boolean cpu){
@@ -25,7 +26,9 @@ public class Player {
         this.cpu = cpu;
         money = 1500;
         position = 0;
-        passedGo = true;
+        passedGo = false; // SHOULD BE FALSE, ONLY TRUE FOR TESTING.
+        inJail = false;
+        heldCards = new Stack();
     }
 
     // This method calculates the players "position" and if they go round the board
@@ -98,6 +101,13 @@ public class Player {
         this.position = position;
     }
 
+    public void setInJail(){
+        inJail = true;
+    }
+
+    public void setOutJail(){
+        inJail = false;
+    }
 
 
 }
