@@ -1,6 +1,7 @@
 /**
  *
  * @author Oliver(134730)
+ *
  */
 
 public class Card {
