@@ -83,19 +83,24 @@ public class Game {
         while(!gameFinished) {
             Player currPlayer = players[currentTurn];
             String playerName = currPlayer.getPlayerName();
-
             //1st roll
             if(!currPlayer.inJail) {
-                rollDiceDialog(playerName + ", it is your turn. Please roll the dice.");
+                if(!currPlayer.isCPU){
+                    rollDiceDialog(playerName + ", it is your turn. Please roll the dice.");
+                }
                 int diceRoll[] = rollDice();
-                diceRollDialog(diceRoll);
+                if(!currPlayer.isCPU) {
+                    diceRollDialog(diceRoll);
+                }
                 currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
                 System.out.println(currPlayer.getPlayerName() + " you landed on " + board.board[currPlayer.getPosition()].getName());
                 //@146674: Execute board location action on player
                 doAction(currPlayer, diceRoll);
                 //Check to see if player has rolled doubles.
                 if (diceRoll[0] == diceRoll[1]) {
-                    rollDiceDialog("You rolled doubles. Please roll again");
+                    if(!currPlayer.isCPU) {
+                        rollDiceDialog("You rolled doubles. Please roll again");
+                    }
                     diceRoll = rollDice();
                     diceRollDialog(diceRoll);
                     currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
@@ -104,16 +109,20 @@ public class Game {
                     doAction(currPlayer, diceRoll);
                     //Check to see if player rolled doubles again
                     if (diceRoll[0] == diceRoll[1]) {
-                        rollDiceDialog("You rolled doubles again. Roll again. If you get doubles you will go to jail.");
+                        if(!currPlayer.isCPU) {
+                            rollDiceDialog("You rolled doubles again. Roll again. If you get doubles you will go to jail.");
+                        }
                         diceRoll = rollDice();
                         diceRollDialog(diceRoll);
                         if (diceRoll[0] == diceRoll[1]) {
-                            jailDialog("You rolled three doubles in a row, your going to jail!");
-                            if(!currPlayer.heldCards.empty()){
+                            if(!currPlayer.isCPU) {
+                                jailDialog("You rolled three doubles in a row, your going to jail!");
+                            }
+                            if (!currPlayer.heldCards.empty()) {
                                 Card card = currPlayer.heldCards.pop();
-                                if(card.getValue()==1){
+                                if (card.getValue() == 1) {
                                     potLuck.addCard(card);
-                                } else if(card.getValue()==2){
+                                } else if (card.getValue() == 2) {
                                     opportunityKnocks.addCard(card);
                                 }
                                 System.out.println(currPlayer.getPlayerName() + " used their get out of jail free card.");
@@ -122,7 +131,12 @@ public class Game {
                                 System.out.println(currPlayer.getPlayerName() + " you landed on " + board.board[currPlayer.getPosition()].getName());
                                 nextTurn(noOfPlayers);
                             } else {
-                                int n = payJailDialog(currPlayer.getPlayerName());
+                                int n;
+                                if(!currPlayer.isCPU) {
+                                    n = payJailDialog(currPlayer.getPlayerName());
+                                } else {
+                                    n = (int) Math.round(Math.random());
+                                }
                                 if (n == 0) {
                                     payJail(currPlayer, 50);
                                 } else if (n == 1) {
@@ -155,6 +169,8 @@ public class Game {
                     }
                     nextTurn(noOfPlayers);
                 }
+                    //CPU ACTIONS
+
             } else {
                 jailCheck(currPlayer);
                 nextTurn(noOfPlayers);
@@ -330,16 +346,20 @@ public class Game {
         if (player.passedGo) {
             BoardLocation currLoc = board.board[player.getPosition()];
             if (currLoc.canBuy() && !currLoc.isOwned()) {
-                Object[] buyoptions = {"Yes", "No"};
-                int n = JOptionPane.showOptionDialog(null,
-                        (player.getPlayerName() + ", you have landed on " + currLoc.getName() + ", would you like to buy it for: " + currLoc.getPrice() + "?"),
-                        "Property Purchase",
-                        JOptionPane.PLAIN_MESSAGE,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        buyoptions,
-                        buyoptions[0]);
-
+                int n;
+                if(!player.isCPU) {
+                    Object[] buyoptions = {"Yes", "No"};
+                    n = JOptionPane.showOptionDialog(null,
+                            (player.getPlayerName() + ", you have landed on " + currLoc.getName() + ", would you like to buy it for: " + currLoc.getPrice() + "?"),
+                            "Property Purchase",
+                            JOptionPane.PLAIN_MESSAGE,
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,
+                            buyoptions,
+                            buyoptions[0]);
+                } else {
+                    n = (int) Math.round(Math.random());
+                }
                 if(n == -1){
                     System.exit(0);
                 }

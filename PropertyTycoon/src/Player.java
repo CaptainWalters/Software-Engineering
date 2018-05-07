@@ -12,7 +12,7 @@ public class Player {
     int playerNo;
     String playerName;
     Enum token;
-    boolean cpu;
+    boolean isCPU;
     boolean passedGo;
     int position;
     Stack<Card> heldCards;
@@ -23,7 +23,7 @@ public class Player {
         this.playerNo = playerNo;
         this.playerName = playerName;
         this.token = token;
-        this.cpu = cpu;
+        isCPU = cpu;
         money = 1500;
         position = 0;
         passedGo = false; // SHOULD BE FALSE, ONLY TRUE FOR TESTING.
@@ -70,7 +70,7 @@ public class Player {
     }
 
     public boolean isCPU(){
-        return cpu;
+        return isCPU;
     }
 
     //Getters & Setters End
