@@ -90,6 +90,7 @@ public class Game {
                 int diceRoll[] = rollDice();
                 diceRollDialog(diceRoll);
                 currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
+                System.out.println(currPlayer.getPlayerName() + " you landed on " + board.board[currPlayer.getPosition()].getName());
                 //@146674: Execute board location action on player
                 doAction(currPlayer, diceRoll);
                 //Check to see if player has rolled doubles.
@@ -98,6 +99,7 @@ public class Game {
                     diceRoll = rollDice();
                     diceRollDialog(diceRoll);
                     currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
+                    System.out.println(currPlayer.getPlayerName() + " you landed on " + board.board[currPlayer.getPosition()].getName());
                     //@146674: Execute board location action on player
                     doAction(currPlayer, diceRoll);
                     //Check to see if player rolled doubles again
@@ -117,6 +119,7 @@ public class Game {
                                 System.out.println(currPlayer.getPlayerName() + " used their get out of jail free card.");
                                 currPlayer.inJail = false;
                                 currPlayer.moveToPosition(10);
+                                System.out.println(currPlayer.getPlayerName() + " you landed on " + board.board[currPlayer.getPosition()].getName());
                                 nextTurn(noOfPlayers);
                             } else {
                                 int n = payJailDialog(currPlayer.getPlayerName());
@@ -125,11 +128,13 @@ public class Game {
                                 } else if (n == 1) {
                                     jailTurnCounter.put(currPlayer, 0);
                                     currPlayer.moveToPosition(99);
+                                    System.out.println(currPlayer.getPlayerName() + " you landed on " + board.board[currPlayer.getPosition()].getName());
                                     currPlayer.setInJail();
                                 }
                             }
                         } else {
                             currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
+                            System.out.println(currPlayer.getPlayerName() + " you landed on " + board.board[currPlayer.getPosition()].getName());
                             //@146674: Execute board location action on player
                             doAction(currPlayer, diceRoll);
                             //Check space
@@ -458,65 +463,75 @@ public class Game {
                 }
             }
 
-            String[] playerPropertiesString = new String[playerProperties.size()];
+            if(playerProperties.size()>0) {
 
-            for (int i = 0; i < playerProperties.size(); i++) {
-                playerPropertiesString[i] = playerProperties.get(i).getName();
-            }
+                String[] playerPropertiesString = new String[playerProperties.size()];
 
-
-            ArrayList<BoardLocation> otherPlayerProperties = new ArrayList<>();
-
-            for (int i = 0; i < 39; i++) {
-                if (board.board[i].getOwner() == otherPlayer) {
-                    otherPlayerProperties.add(board.board[i]);
-                }
-            }
-
-            String[] otherPlayerPropertiesString = new String[otherPlayerProperties.size()];
-
-            for (int i = 0; i < otherPlayerProperties.size(); i++) {
-                otherPlayerPropertiesString[i] = otherPlayerProperties.get(i).getName();
-            }
-
-            JList pList = new JList(playerPropertiesString);
-            JList oList = new JList(otherPlayerPropertiesString);
-
-
-            Object[] message = {"Please select your properties that you wish to trade :", pList, "Please select " + otherPlayer.getPlayerName() + "'s properties that you want:", oList};
-            int option = JOptionPane.showConfirmDialog(null, message, "Trade System.", JOptionPane.OK_CANCEL_OPTION);
-
-            if (option == -1) {
-                System.exit(0);
-            }
-
-            int[] pSelected = pList.getSelectedIndices();
-            int[] oSelected = oList.getSelectedIndices();
-
-            BoardLocation[] selectedPlayersProperties = new BoardLocation[pSelected.length];
-            BoardLocation[] selectedOtherPlayersProperties = new BoardLocation[oSelected.length];
-
-            //swapping properties for current player
-            if (pSelected.length > 0) {
-                for (int i = 0; i < pSelected.length; i++) {
-                    selectedPlayersProperties[i] = playerProperties.get(pSelected[i]);
+                for (int i = 0; i < playerProperties.size(); i++) {
+                    playerPropertiesString[i] = playerProperties.get(i).getName();
                 }
 
-                for (int i = 0; i < selectedPlayersProperties.length; i++) {
-                    selectedPlayersProperties[i].setOwner(otherPlayer);
-                }
-            }
 
-            //Swapping properties for other player
-            if (oSelected.length > 0) {
-                for (int i = 0; i < oSelected.length; i++) {
-                    selectedOtherPlayersProperties[i] = otherPlayerProperties.get(oSelected[i]);
+                ArrayList<BoardLocation> otherPlayerProperties = new ArrayList<>();
+
+                for (int i = 0; i < 39; i++) {
+                    if (board.board[i].getOwner() == otherPlayer) {
+                        otherPlayerProperties.add(board.board[i]);
+                    }
                 }
 
-                for (int i = 0; i < selectedOtherPlayersProperties.length; i++) {
-                    selectedOtherPlayersProperties[i].setOwner(currPlayer);
-                }
+                if(otherPlayerProperties.size()>0) {
 
+                    String[] otherPlayerPropertiesString = new String[otherPlayerProperties.size()];
+
+                    for (int i = 0; i < otherPlayerProperties.size(); i++) {
+                        otherPlayerPropertiesString[i] = otherPlayerProperties.get(i).getName();
+                    }
+
+                    JList pList = new JList(playerPropertiesString);
+                    JList oList = new JList(otherPlayerPropertiesString);
+
+
+                    Object[] message = {"Please select your properties that you wish to trade :", pList, "Please select " + otherPlayer.getPlayerName() + "'s properties that you want:", oList};
+                    int option = JOptionPane.showConfirmDialog(null, message, "Trade System.", JOptionPane.OK_CANCEL_OPTION);
+
+                    if (option == -1) {
+                        System.exit(0);
+                    }
+
+                    int[] pSelected = pList.getSelectedIndices();
+                    int[] oSelected = oList.getSelectedIndices();
+
+                    BoardLocation[] selectedPlayersProperties = new BoardLocation[pSelected.length];
+                    BoardLocation[] selectedOtherPlayersProperties = new BoardLocation[oSelected.length];
+
+                    //swapping properties for current player
+                    if (pSelected.length > 0) {
+                        for (int i = 0; i < pSelected.length; i++) {
+                            selectedPlayersProperties[i] = playerProperties.get(pSelected[i]);
+                        }
+
+                        for (int i = 0; i < selectedPlayersProperties.length; i++) {
+                            selectedPlayersProperties[i].setOwner(otherPlayer);
+                        }
+                    }
+
+                    //Swapping properties for other player
+                    if (oSelected.length > 0) {
+                        for (int i = 0; i < oSelected.length; i++) {
+                            selectedOtherPlayersProperties[i] = otherPlayerProperties.get(oSelected[i]);
+                        }
+
+                        for (int i = 0; i < selectedOtherPlayersProperties.length; i++) {
+                            selectedOtherPlayersProperties[i].setOwner(currPlayer);
+                        }
+
+                    }
+                } else {
+                    System.out.println(otherPlayer.getPlayerName() + " doesn't have any properties to trade");
+                }
+            } else {
+                System.out.println("You have no properties to trade.");
             }
         } else {
             System.out.println("There is no-one to trade with.");
@@ -526,7 +541,6 @@ public class Game {
     //@146674
     // Executes an action on player that landed on a location during their turn
     public boolean doAction(Player player, int[] dice){
-        if (player.passedGo) {
             BoardLocation currLoc = board.board[player.getPosition()];
             int value = 0; // Arbitrary final cost holder for calculations performed below
             
@@ -620,7 +634,7 @@ public class Game {
                     developLocation(player);
                     return false;
             }
-        }
+
         return false;
     }
 
