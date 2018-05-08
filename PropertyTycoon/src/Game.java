@@ -102,7 +102,9 @@ public class Game {
                         rollDiceDialog("You rolled doubles. Please roll again");
                     }
                     diceRoll = rollDice();
-                    diceRollDialog(diceRoll);
+                    if(!currPlayer.isCPU) {
+                        diceRollDialog(diceRoll);
+                    }
                     currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
                     System.out.println(currPlayer.getPlayerName() + " you landed on " + board.board[currPlayer.getPosition()].getName());
                     //@146674: Execute board location action on player
@@ -113,7 +115,9 @@ public class Game {
                             rollDiceDialog("You rolled doubles again. Roll again. If you get doubles you will go to jail.");
                         }
                         diceRoll = rollDice();
-                        diceRollDialog(diceRoll);
+                        if(!currPlayer.isCPU) {
+                            diceRollDialog(diceRoll);
+                        }
                         if (diceRoll[0] == diceRoll[1]) {
                             if(!currPlayer.isCPU) {
                                 jailDialog("You rolled three doubles in a row, your going to jail!");
@@ -141,7 +145,7 @@ public class Game {
                                     payJail(currPlayer, 50);
                                 } else if (n == 1) {
                                     jailTurnCounter.put(currPlayer, 0);
-                                    currPlayer.moveToPosition(99);
+                                    currPlayer.moveToPosition(40);
                                     System.out.println(currPlayer.getPlayerName() + " you landed on " + board.board[currPlayer.getPosition()].getName());
                                     currPlayer.setInJail();
                                 }
@@ -175,6 +179,7 @@ public class Game {
                 jailCheck(currPlayer);
                 nextTurn(noOfPlayers);
             }
+            updateRoundNumber();
         }
     }
 
@@ -333,9 +338,21 @@ public class Game {
             if( board.getNumberOfLocationsOwnedByPlayerUsingColour(player, currLoc.getColour()) == set){ // Check player owns all properties in that colour
                 for( int numOfProps = currLoc.numberOfPropertiesBuilt(); numOfProps<5; numOfProps++ ){ // Loop through remaining undeveloped properties
                     // Ask if player would like to purchase a house (and loop) or exit
-                    if( developLocationDialog(currLoc.getName(), currLoc.getHouseDevelopmentPrice()) == 0 ) // Dialog 'Yes' button pressed
-                        currLoc.buyHouse(player);
-                    else return; // Dialog 'No' button pressed (exit loop)
+                    if(!player.isCPU){
+                        if( developLocationDialog(currLoc.getName(), currLoc.getHouseDevelopmentPrice()) == 0 ) { // Dialog 'Yes' button pressed
+                            currLoc.buyHouse(player);
+                        } else {
+                            return;// Dialog 'No' button pressed (exit loop)
+                        }
+                    } else {
+                        // CPU DEVELOP
+                        int n = (int) Math.round(Math.random());
+                        if(n==1) {
+                            currLoc.buyHouse(player);
+                        } else {
+                            return;
+                        }
+                    }
                 }
             }
         }
@@ -663,6 +680,11 @@ public class Game {
         String action = card.getAction();
         int value = card.getValue();
         System.out.println( card.getDescription() );
+        if (card.getValue() == 1) {
+            potLuck.addCard(card);
+        } else if (card.getValue() == 2) {
+            opportunityKnocks.addCard(card);
+        }
 
         switch(action) {
             case "get":
@@ -721,7 +743,7 @@ public class Game {
                 return false;
                 
             case "jail": // Currently just sending people to GoToJail location (using jump 30) [FIX!!!]
-                player.moveToPosition(99);
+                player.moveToPosition(40);
                 player.setInJail();
                 return true;
             

@@ -1,4 +1,10 @@
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -7,8 +13,7 @@ import java.util.ArrayList;
  * @author Kieran(132206), Oliver(134730), Vlad (146674)
  *
  */
-public class GameMain {
-    // THIS WHOLE FILE IS THE CONTROLLER
+public class GameMain{
 
 
     public static void main(String[] args) throws IOException {
