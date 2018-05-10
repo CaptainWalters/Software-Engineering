@@ -1,8 +1,15 @@
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.lang.reflect.Method;
+/**
+ *
+ * @author Oliver(134730)
+ *
+ */
 
+import org.junit.jupiter.api.Test;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,10 +18,16 @@ class DeckTest {
     File luck = new File(getClass().getResource("PotLuck.csv").getPath());
     File knocks = new File(getClass().getResource("OpportunityKnocks.csv").getPath());
 
-
     @Test
     void testFullFileRead() {
-
+        Deck test = new Deck(luck);
+        Card held = null;
+        assertEquals(test.getDeckSize(),16);
+        assertNotNull(test.peekAtNextCard().getDescription());
+        for(int i=0;i<16;i++) {
+            held = test.drawCard();
+        }
+        assertNotNull(held.getDescription());
     }
 
     @Test
@@ -23,15 +36,15 @@ class DeckTest {
         assertEquals(16, dL.getDeckSize());
         while(dL.getDeckSize() > 0){
             Card c = dL.drawCard();
-            System.out.println(c.getDescription());
+            //System.out.println(c.getDescription());
         }
         assertEquals(0, dL.getDeckSize());
 
         Deck oK = new Deck(knocks);
         assertEquals(16, oK.getDeckSize());
         while(oK.getDeckSize() > 0){
-            Card c = dL.drawCard();
-            System.out.println(c.getDescription());
+            Card c = oK.drawCard();
+            //System.out.println(c.getDescription());
         }
         assertEquals(0, oK.getDeckSize());
 
@@ -43,8 +56,8 @@ class DeckTest {
         Card a = dL.peekAtNextCard();
         dL.shuffle();
         Card b = dL.peekAtNextCard();
-        System.out.println(a.getDescription());
-        System.out.println(b.getDescription());
+//        System.out.println(a.getDescription());
+//        System.out.println(b.getDescription());
         assertNotNull(a);
         assertNotEquals(a, b);
     }

@@ -1,5 +1,10 @@
-import org.junit.jupiter.api.Test;
+/**
+ *
+ * @author Oliver(134730)
+ *
+ */
 
+import org.junit.jupiter.api.Test;
 
 class BoardTest {
 
