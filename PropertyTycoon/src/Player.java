@@ -89,8 +89,8 @@ public class Player {
         card = deck.drawCard();
         action = card.getAction();
 
-        if(action.equals("keep")) {
-            heldCards.push(card);
+        if(action.equals("multipass")) {
+            keepCard(card);
             return null;
         } else {
             return card;
@@ -109,5 +109,10 @@ public class Player {
         inJail = false;
     }
 
-
+    public void keepCard(Card card){
+        heldCards.push(card);
+    }
+    public Card returnCard(){
+        return heldCards.pop();
+    }
 }
