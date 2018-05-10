@@ -42,6 +42,9 @@ public class Player {
         }
     }
 
+    public void setMoney(int i){
+        money = i;
+    }
     //Getters & Setters
 
     private void passedGo() {
