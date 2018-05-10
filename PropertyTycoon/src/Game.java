@@ -20,6 +20,7 @@ public class Game {
 
     File luck = new File(getClass().getResource("PotLuck.csv").getPath());
     File knocks = new File(getClass().getResource("OpportunityKnocks.csv").getPath());
+    File boardCSV = new File(getClass().getResource("Board.csv").getPath());
     private int noOfPlayers;
     ArrayList<Player> players;
     Dice dice1;
@@ -51,7 +52,7 @@ public class Game {
      * @throws IOException
      */
     public void init() throws IOException {
-        board = new Board();
+        board = new Board(boardCSV);
         dice1 = new Dice();
         dice2 = new Dice();
         potLuck = new Deck(luck);
