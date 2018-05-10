@@ -7,7 +7,6 @@
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.*;
 import java.util.Timer;
@@ -22,7 +21,7 @@ public class Game {
     File luck = new File(getClass().getResource("PotLuck.csv").getPath());
     File knocks = new File(getClass().getResource("OpportunityKnocks.csv").getPath());
     private int noOfPlayers;
-    Player[] players;
+    ArrayList<Player> players;
     Dice dice1;
     Dice dice2;
     Board board;
@@ -38,10 +37,10 @@ public class Game {
     int currentTurn = 0;
     int roundNumber = 0;
 
-    public Game(Player[] players, boolean trading, boolean abridged, int timer) throws IOException {
+    public Game(ArrayList<Player> players, boolean trading, boolean abridged, int timer) throws IOException {
         timerInt = timer;
         this.players = players;
-        this.noOfPlayers = players.length;
+        this.noOfPlayers = players.size();
         tradingAllowed = trading;
         init();
         takeTurn();
@@ -59,9 +58,11 @@ public class Game {
         potLuck.shuffle();
         opportunityKnocks = new Deck(knocks);
         opportunityKnocks.shuffle();
-        this.timer = new Timer();
-        timer.schedule(endGameEvaluation(), timerInt*60*100);
         freeParking = 0;
+        if(timerInt>0) {
+            this.timer = new Timer();
+            timer.schedule(endGameEvaluation(), timerInt * 60 * 100);
+        }
     }
 
     //132206
@@ -77,19 +78,19 @@ public class Game {
 
     //132206
     private void endGame() {
-        int[] playerValue = new int[players.length];
+        int[] playerValue = new int[players.size()];
         int maxValue = 0;
         int maxPlayerIndex = -1;
         boolean tiedWinner = false;
 
-        for(int i = 0; i<players.length;i++) {
+        for(int i = 0; i<players.size();i++) {
             int playerAssets = 0;
             for (int j = 0; j < 40; j++) {
-                if (board.board[j].getOwner() == players[i]) {
+                if (board.board[j].getOwner() == players.get(i)) {
                     playerAssets += board.board[j].getPrice();
                 }
             }
-            playerValue[i] = playerAssets+players[i].getMoney();
+            playerValue[i] = playerAssets+players.get(i).getMoney();
         }
 
         for(int e = 0; e < playerValue.length; e++){
@@ -102,7 +103,7 @@ public class Game {
         }
 
         if(!tiedWinner){
-            System.out.println("Timer finished, " + players[maxPlayerIndex].getPlayerName() + " won! Had an asset value of: " + maxValue);
+            System.out.println("Timer finished, " + players.get(maxPlayerIndex).getPlayerName() + " won! Had an asset value of: " + maxValue);
         } else {
             System.out.println("There is a tie for winning place.");
         }
@@ -132,7 +133,7 @@ public class Game {
         // need to check if spaceis "Special"
 
         while(!gameFinished) {
-            Player currPlayer = players[currentTurn];
+            Player currPlayer = players.get(currentTurn);
             String playerName = currPlayer.getPlayerName();
             //1st roll
             if(!currPlayer.inJail) {
@@ -190,7 +191,8 @@ public class Game {
                                 if(!currPlayer.isCPU) {
                                     n = payJailDialog(currPlayer.getPlayerName());
                                 } else {
-                                    n = (int) Math.round(Math.random());
+                                    Random rand = new Random();
+                                    n = rand.nextInt((1 - 0) + 1) + 0;
                                 }
                                 if (n == 0) {
                                     payJail(currPlayer, 50);
@@ -414,7 +416,9 @@ public class Game {
                         }
                     } else {
                         // CPU DEVELOP
-                        int n = (int) Math.round(Math.random());
+                        int n;
+                        Random rand = new Random();
+                        n = rand.nextInt((1 - 0) + 1) + 0;
                         if(n==1) {
                             currLoc.buyHouse(player);
                         } else {
@@ -443,7 +447,8 @@ public class Game {
                             buyoptions,
                             buyoptions[0]);
                 } else {
-                    n = (int) Math.round(Math.random());
+                    Random rand = new Random();
+                    n = rand.nextInt((1 - 0) + 1) + 0;
                 }
                 if(n == -1){
                     System.exit(0);
@@ -457,7 +462,7 @@ public class Game {
                 } else if (n == 1) {
                     doAuction(currLoc);
                 }
-            } else if( currLoc.isOwned() && !currLoc.getOwner().equals( player ) && currLoc.getAction().equals("") && !currLoc.getOwner().inJail ){
+            } else if( currLoc.isOwned() && !currLoc.getOwner().equals( player ) && currLoc.getAction().equals("") && !currLoc.getOwner().inJail && !currLoc.getMortgaged() ){
                 if(player.getMoney()>= currLoc.getRentPrice()){
                     // @146674: if square is owned and cannot be baught, force player to pay rent if not owned by themselves
                     System.out.println("Player " + player.getPlayerName() + " paid " + currLoc.getOwner().getPlayerName() + " the amount of " + currLoc.getRentPrice() + " for landing on " + currLoc.getName());
@@ -465,7 +470,6 @@ public class Game {
                     currLoc.getOwner().addMoney( currLoc.getRentPrice() ); // Add rent money to landlord
                 } else if(player.getMoney()<currLoc.getRentPrice()){
                     sellMortgageProperties(player, currLoc.getRentPrice());
-                    System.out.println("YOU IS BROKE");
                 }
             } else if(currLoc.canBuy() && !currLoc.isOwned() && (player.getMoney()<currLoc.getPrice())){
                 System.out.println("You cannot afford to buy the location");
@@ -476,13 +480,44 @@ public class Game {
     private void sellMortgageProperties(Player player, int rentPrice) {
         int sellMortgagePrice;
         int n;
+        boolean mortgageableProperties = true;
+        boolean sellableProperties = true;
+        int noOfMortgaged = 0;
+        int mortgagePrice = 0;
+        int sellPrice = 0;
 
-        if(!player.isCPU) {
-            n = sellMortgageDialog("You owe somebody rent of: " + rentPrice + " but you only have " + player.getMoney() + ". Would you like to sell or mortgage your properties?");
-        } else {
-            n = (int) Math.round(Math.random());
+        ArrayList<BoardLocation> playerProperties = board.getLocationsOwnedByPlayer(player);
+
+        for(int i = 0; i< playerProperties.size(); i++){
+            if(playerProperties.get(i).getMortgaged()){
+                noOfMortgaged +=1;
+                mortgagePrice += ((playerProperties.get(i).getPrice())/2);
+                sellPrice += ((playerProperties.get(i).getPrice()));
+            }
         }
 
+
+        if(rentPrice<mortgagePrice) {
+            if(!player.isCPU) {
+                n = sellMortgageDialog("You owe somebody rent of: " + rentPrice + " but you only have " + player.getMoney() + ". Would you like to sell or mortgage your properties?");
+            } else {
+                n = 0;
+            }
+        } else if(rentPrice<sellPrice){
+            n=1;
+        } else {
+            for(int i = 0; i<playerProperties.size();i++){
+                playerProperties.get(i).setOwner(null);
+            }
+            int e = JOptionPane.showConfirmDialog(null, (player.getPlayerName()) + " is bankrupt! They are no longer playing.", "Bankrupt Player.", JOptionPane.DEFAULT_OPTION);
+            players.remove(player);
+            noOfPlayers -= 1;
+            isGameFinished();
+            n=-2;
+        }
+
+
+        //RANDOM CHOICE FOR CPU????
         if(n == 0){
             //do sell
         } else if ( n == 1){
@@ -494,17 +529,17 @@ public class Game {
     // Creates an auction if they player declines to buy property.
     //TODO: does not check to see if two bids are the same.
     public void doAuction(BoardLocation currLoc){
-        if(players.length>2) {
+        if(players.size()>2) {
             if (allPlayersPassedGo) {
-                int[] bidArr = new int[players.length];
+                int[] bidArr = new int[players.size()];
                 Player winningPlayer = null;
                 int winningBid = 0;
                 int dupBid = 0;
                 JTextField pbid = new JTextField();
 
-                for (int i = 0; i < players.length; i++) {
-                    if (!players[i].inJail) {
-                        Object[] message = {currLoc.getName() + " is up for auction. " + players[i].getPlayerName() + ", please enter your bid. You only get one bid!", pbid};
+                for (int i = 0; i < players.size(); i++) {
+                    if (!players.get(i).inJail && !players.get(i).isCPU()) {
+                        Object[] message = {currLoc.getName() + " is up for auction. " + players.get(i).getPlayerName() + ", please enter your bid. You only get one bid!", pbid};
                         int playerBid = JOptionPane.showConfirmDialog(null, message, "Property Auction.", JOptionPane.OK_CANCEL_OPTION);
                         if (playerBid == -1) {
                             System.exit(0);
@@ -513,6 +548,10 @@ public class Game {
                         }
                         bidArr[i] = Integer.parseInt(pbid.getText());
                         pbid.setText("");
+                    } else if(players.get(i).isCPU()) {
+                        Random r = new Random();
+                        double randomValue = 0 + (2 - 0) * r.nextDouble();
+                        bidArr[i] = (int) (currLoc.getPrice()*randomValue);
                     } else {
                         bidArr[i] = 0;
                     }
@@ -521,7 +560,7 @@ public class Game {
                 for (int i = 0; i < bidArr.length; i++) {
                     if (bidArr[i] > winningBid) {
                         winningBid = bidArr[i];
-                        winningPlayer = players[i];
+                        winningPlayer = players.get(i);
                     } else if (bidArr[i] == winningBid) {
                         dupBid = winningBid;
                     }
@@ -554,7 +593,7 @@ public class Game {
 
         Player otherPlayer;
 
-        ArrayList<Player> otherPlayers = new ArrayList<>(Arrays.asList(players));
+        ArrayList<Player> otherPlayers = players;
         otherPlayers.remove(currPlayer);
 
 
@@ -810,8 +849,8 @@ public class Game {
                 int num = player.getPlayerNumber();
                 int collection = 0;
                 Player thisPlayer = null;
-                for(int i=0;i<players.length;i++) {
-                    thisPlayer = players[i];
+                for(int i=0;i<players.size();i++) {
+                    thisPlayer = players.get(i);
                     if (thisPlayer.playerNo != num) {
                         thisPlayer.payMoney(value);
                         collection += value;
@@ -848,7 +887,7 @@ public class Game {
     }
 
     private void isGameFinished() {
-        if(players.length<2){
+        if(players.size()<2){
             gameFinished = true;
         }
     }
@@ -872,8 +911,8 @@ public class Game {
 
         if(!allPlayersPassedGo){
             allPlayersPassedGo = true;
-            for(int i = 0; i<players.length;i++){
-                if(!players[i].passedGo&&allPlayersPassedGo){
+            for(int i = 0; i<players.size();i++){
+                if(!players.get(i).passedGo&&allPlayersPassedGo){
                     allPlayersPassedGo = false;
                 }
             }

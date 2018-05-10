@@ -143,8 +143,18 @@ public class BoardLocation {
      }
 
      public void mortgageLocation(){
-         if(isOwned()){
+            setMortgaged(true);
+     }
 
-         }
+     public void unmortgageLocation(){
+         setMortgaged(false);
+     }
+
+     public void setMortgaged(boolean value){
+         mortgaged = value;
+     }
+
+     public boolean getMortgaged(){
+         return mortgaged;
      }
 }

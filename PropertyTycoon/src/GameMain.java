@@ -19,7 +19,7 @@ public class GameMain{
     public static void main(String[] args) throws IOException {
         ImageIcon img = new ImageIcon("//res/logo.png");
         int totalPlayers = 0;
-        Player[] players;
+        ArrayList<Player> players = new ArrayList<>();
         int timer = 0;
 
 
@@ -55,7 +55,7 @@ public class GameMain{
             System.exit(0);
         }
 
-        players = new Player[totalPlayers];
+
         String[] cpuOptions = new String[]{"No","Yes"};
         ArrayList<String> tokenOptions = new ArrayList();
         tokenOptions.add("Boot");
@@ -93,22 +93,22 @@ public class GameMain{
             if (option == 0) {
                 if (token.getSelectedItem().equals("Boot")) {
                     etoken = Token.Boot;
-                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                    players.add(new Player(i, pname.getText(), etoken, cpuChoice));
                 } else if (token.getSelectedItem().equals("Hatstand")) {
                     etoken = Token.Hatstand;
-                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                    players.add(new Player(i, pname.getText(), etoken, cpuChoice));
                 } else if (token.getSelectedItem().equals("Spoon")) {
                     etoken = Token.Spoon;
-                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                    players.add(new Player(i, pname.getText(), etoken, cpuChoice));
                 } else if (token.getSelectedItem().equals("Goblet")) {
                     etoken = Token.Goblet;
-                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                    players.add(new Player(i, pname.getText(), etoken, cpuChoice));
                 } else if (token.getSelectedItem().equals("Cat")) {
                     etoken = Token.Cat;
-                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                    players.add(new Player(i, pname.getText(), etoken, cpuChoice));
                 } else if (token.getSelectedItem().equals("Smartphone")) {
                     etoken = Token.Smartphone;
-                    players[i - 1] = new Player(i, pname.getText(), etoken, cpuChoice);
+                    players.add(new Player(i, pname.getText(), etoken, cpuChoice));
                 }
 
                 pname.setText("");

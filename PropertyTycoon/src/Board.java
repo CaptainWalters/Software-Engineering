@@ -27,6 +27,7 @@ public class Board {
                  playerProperties.add(board[i]);
              }
          }
+         return playerProperties;
      }
      
      //@146674
