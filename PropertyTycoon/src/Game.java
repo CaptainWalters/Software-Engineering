@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.*;
+import java.util.Timer;
 
 /**
  *The Game class runs an instance of the classic game of property tycoon. It is responsible for initialising
@@ -32,16 +33,15 @@ public class Game {
     Boolean tradingAllowed;
     Boolean allPlayersPassedGo = false;
     public HashMap<Player,Integer> jailTurnCounter = new HashMap();
-
-
-
+    int timerInt;
+    public Timer timer;
     int currentTurn = 0;
     int roundNumber = 0;
 
-    public Game(Player[] players, boolean trading, boolean abridged) throws IOException {
+    public Game(Player[] players, boolean trading, boolean abridged, int timer) throws IOException {
+        timerInt = timer;
         this.players = players;
         this.noOfPlayers = players.length;
-        freeParking = 0;
         tradingAllowed = trading;
         init();
         takeTurn();
@@ -57,6 +57,55 @@ public class Game {
         dice2 = new Dice();
         potLuck = new Deck(luck);
         opportunityKnocks = new Deck(knocks);
+        this.timer = new Timer();
+        timer.schedule(endGameEvaluation(), timerInt*60*100);
+        freeParking = 0;
+    }
+
+    //132206
+    private TimerTask endGameEvaluation() {
+        return new TimerTask() {
+            @Override
+            public void run() {
+                endGame();
+            }
+        };
+
+    }
+
+    //132206
+    private void endGame() {
+        int[] playerValue = new int[players.length];
+        int maxValue = 0;
+        int maxPlayerIndex = -1;
+        boolean tiedWinner = false;
+
+        for(int i = 0; i<players.length;i++) {
+            int playerAssets = 0;
+            for (int j = 0; j < 40; j++) {
+                if (board.board[j].getOwner() == players[i]) {
+                    playerAssets += board.board[j].getPrice();
+                }
+            }
+            playerValue[i] = playerAssets+players[i].getMoney();
+        }
+
+        for(int e = 0; e < playerValue.length; e++){
+            if(playerValue[e]>maxValue){
+                maxValue = playerValue[e];
+                maxPlayerIndex = e;
+            } if (playerValue[e] == maxValue){
+                tiedWinner = true;
+            }
+        }
+
+        if(!tiedWinner){
+            System.out.println("Timer finished, " + players[maxPlayerIndex].getPlayerName() + " won! Had an asset value of: " + maxValue);
+        } else {
+            System.out.println("There is a tie for winning place.");
+        }
+
+        System.exit(0);
     }
 
     public int[] rollDice(){
@@ -247,6 +296,23 @@ public class Game {
         }
     }
 
+    private int sellMortgageDialog(String message) {
+        Object[] selloptions = {"Sell", "Mortgage"};
+        int n = JOptionPane.showOptionDialog(null,
+                message,"You need some money!",
+                JOptionPane.PLAIN_MESSAGE,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                selloptions,
+                selloptions[0]);
+
+        if(n == -1){
+            System.exit(0);
+        }
+
+        return n;
+    }
+
     private int payJailDialog(String currPlayer) {
         Object[] jailoptions = {"PAY", "DONT PAY"};
         int n = JOptionPane.showOptionDialog(null,
@@ -362,7 +428,7 @@ public class Game {
     private void offerToBuy(Player player) {
         if (player.passedGo) {
             BoardLocation currLoc = board.board[player.getPosition()];
-            if (currLoc.canBuy() && !currLoc.isOwned()) {
+            if (currLoc.canBuy() && !currLoc.isOwned() & (player.getMoney()>=currLoc.getPrice())) {
                 int n;
                 if(!player.isCPU) {
                     Object[] buyoptions = {"Yes", "No"};
@@ -390,11 +456,35 @@ public class Game {
                     doAuction(currLoc);
                 }
             } else if( currLoc.isOwned() && !currLoc.getOwner().equals( player ) && currLoc.getAction().equals("") && !currLoc.getOwner().inJail ){
-                // @146674: if square is owned and cannot be baught, force player to pay rent if not owned by themselves
-                System.out.println("Player " + player.getPlayerName() + " paid " + currLoc.getOwner().getPlayerName() + " the amount of " + currLoc.getRentPrice() + " for landing on " + currLoc.getName());
-                player.payMoney( currLoc.getRentPrice() ); // Take rent money from current player
-                currLoc.getOwner().addMoney( currLoc.getRentPrice() ); // Add rent money to landlord
+                if(player.getMoney()>= currLoc.getRentPrice()){
+                    // @146674: if square is owned and cannot be baught, force player to pay rent if not owned by themselves
+                    System.out.println("Player " + player.getPlayerName() + " paid " + currLoc.getOwner().getPlayerName() + " the amount of " + currLoc.getRentPrice() + " for landing on " + currLoc.getName());
+                    player.payMoney( currLoc.getRentPrice() ); // Take rent money from current player
+                    currLoc.getOwner().addMoney( currLoc.getRentPrice() ); // Add rent money to landlord
+                } else if(player.getMoney()<currLoc.getRentPrice()){
+                    sellMortgageProperties(player, currLoc.getRentPrice());
+                    System.out.println("YOU IS BROKE");
+                }
+            } else if(currLoc.canBuy() && !currLoc.isOwned() && (player.getMoney()<currLoc.getPrice())){
+                System.out.println("You cannot afford to buy the location");
             }
+        }
+    }
+
+    private void sellMortgageProperties(Player player, int rentPrice) {
+        int sellMortgagePrice;
+        int n;
+
+        if(!player.isCPU) {
+            n = sellMortgageDialog("You owe somebody rent of: " + rentPrice + " but you only have " + player.getMoney() + ". Would you like to sell or mortgage your properties?");
+        } else {
+            n = (int) Math.round(Math.random());
+        }
+
+        if(n == 0){
+            //do sell
+        } else if ( n == 1){
+            //do mortgage
         }
     }
 
@@ -511,7 +601,7 @@ public class Game {
 
                 ArrayList<BoardLocation> otherPlayerProperties = new ArrayList<>();
 
-                for (int i = 0; i < 39; i++) {
+                for (int i = 0; i < 40; i++) {
                     if (board.board[i].getOwner() == otherPlayer) {
                         otherPlayerProperties.add(board.board[i]);
                     }
@@ -768,6 +858,8 @@ public class Game {
             gameFinished = true;
         }
     }
+
+
 
     public void nextTurn(int noOfPlayers){
         this.currentTurn +=1;

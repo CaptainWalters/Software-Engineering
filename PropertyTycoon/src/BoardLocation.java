@@ -18,6 +18,7 @@ public class BoardLocation {
      private final String action;
      private boolean canBuy; // Should not be final
      private Player owner; // Should not be final
+     private boolean mortgaged;
 
      public BoardLocation(int position, String name, int value, int[] rent, String colour, String action, boolean canBuy){
          this.position = position;
@@ -29,6 +30,7 @@ public class BoardLocation {
          this.action = action;
          this.canBuy = canBuy;
          this.owner = null;
+         this.mortgaged = false;
      }
 
      // Needs updating after 146674 changes
@@ -138,5 +140,11 @@ public class BoardLocation {
          this.propertyType++; // Add a house
          System.out.println("Player " + player.getPlayerName() + " has built " + this.propertyType + " house(s) on " + this.getName());
          return true;
+     }
+
+     public void mortgageLocation(){
+         if(isOwned()){
+             
+         }
      }
 }

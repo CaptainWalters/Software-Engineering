@@ -20,6 +20,7 @@ public class GameMain{
         ImageIcon img = new ImageIcon("//res/logo.png");
         int totalPlayers = 0;
         Player[] players;
+        int timer = 0;
 
 
         //choose game type
@@ -27,7 +28,12 @@ public class GameMain{
         JCheckBox checkBox2 = new JCheckBox("Allow Trading?");
         Object[] sMessage = {"Please choose a game type:", checkBox1, checkBox2};
         int gameType = JOptionPane.showConfirmDialog(null, sMessage, "Game type selection.", JOptionPane.DEFAULT_OPTION);
-
+        if (checkBox1.isSelected()){
+            JTextField timerField = new JTextField();
+            Object[] message = {"Please enter the length of the game (mins)",timerField};
+            int n = JOptionPane.showConfirmDialog(null, message, "Game Length selection.", JOptionPane.DEFAULT_OPTION);
+            timer = Integer.parseInt(timerField.getText());
+        }
 
         boolean abridged = checkBox1.isSelected();
         boolean trading = checkBox2.isSelected();
@@ -111,7 +117,7 @@ public class GameMain{
 
         }
 
-        Game game = new Game(players, trading, abridged); // MODEL (Data&Logic)
+        Game game = new Game(players, trading, abridged, timer); // MODEL (Data&Logic)
 
     }
 }

@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 /**
  *
@@ -16,6 +18,15 @@ public class Board {
 
      public String getInfo (int position){
          return board[position].getInformation();
+     }
+
+     public ArrayList<BoardLocation> getLocationsOwnedByPlayer(Player player){
+         ArrayList<BoardLocation> playerProperties = new ArrayList<>();
+         for (int i = 0; i < 40; i++) {
+             if (board[i].getOwner() == player) {
+                 playerProperties.add(board[i]);
+             }
+         }
      }
      
      //@146674
@@ -41,14 +52,6 @@ public class Board {
      //@146674
      public int getTotalNumberOfPropertiesDevelopedByPlayer(Player player){
         return ( getNumberOfHousesDevelopedByPlayer(player) + getNumberOfHotelsDevelopedByPlayer(player) );
-        /* OLD, BUT RELIABLE CODE
-        int out = 0;
-        for (BoardLocation location : board)
-            if( location.isOwned() )
-               if( location.getOwner().equals(player) )
-                   out += location.numberOfPropertiesBuilt();
-        return out;
-        */
      }
      
      //@146674
