@@ -56,7 +56,9 @@ public class Game {
         dice1 = new Dice();
         dice2 = new Dice();
         potLuck = new Deck(luck);
+        potLuck.shuffle();
         opportunityKnocks = new Deck(knocks);
+        opportunityKnocks.shuffle();
         this.timer = new Timer();
         timer.schedule(endGameEvaluation(), timerInt*60*100);
         freeParking = 0;

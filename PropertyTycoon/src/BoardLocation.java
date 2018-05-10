@@ -144,7 +144,7 @@ public class BoardLocation {
 
      public void mortgageLocation(){
          if(isOwned()){
-             
+
          }
      }
 }
