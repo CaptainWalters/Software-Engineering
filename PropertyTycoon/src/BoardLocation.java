@@ -31,12 +31,21 @@ public class BoardLocation {
          this.canBuy = canBuy;
          this.owner = null;
          this.mortgaged = false;
+         System.out.println(toString()); // DEBUG
      }
 
-     // Needs updating after 146674 changes
+     //@146674
+     @Override
+     public String toString() {
+         return "Position: " + Integer.toString(position) + "\nName: " + name + "\nPrice to Buy: " + Integer.toString(locationValue)
+                 + "\nBasic Rent: " + rentValue[0]+ "\nRent with 1 House: " + rentValue[1] + "\nRent with 2 Houses: " + rentValue[2]
+                 + "\nRent with 3 Houses: " + rentValue[3] + "\nRent with 4 Houses: " + rentValue[4] + "\nRent with a Hotel: " + rentValue[5]
+                 + "\nColour: " + colour + "\nAction: " + action + "\nCan Player buy this: " + canBuy + "\nCurrent owner: " + owner + "\nProperty Mortgaged: " + mortgaged + "\n";
+     }
+
+     //@146674
      public String getInformation(){
-         String info = ("Position: " + Integer.toString(position) + ".\nName: " + name + ".\nValue: " + Integer.toString(locationValue) + ".\nColour: " + colour +"\n");
-         return info;
+         return this.toString();
      }
      
      //@146674
