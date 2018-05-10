@@ -415,11 +415,11 @@ public class Game {
                             return;// Dialog 'No' button pressed (exit loop)
                         }
                     } else {
-                        // CPU DEVELOP
+                        // CPU DEVELOP if money is above 600
                         int n;
                         Random rand = new Random();
                         n = rand.nextInt((1 - 0) + 1) + 0;
-                        if(n==1) {
+                        if(n==1&&player.getMoney()>600) {
                             currLoc.buyHouse(player);
                         } else {
                             return;
@@ -478,6 +478,10 @@ public class Game {
     }
 
     private void sellMortgageProperties(Player player, int rentPrice) {
+
+        //TODO Sell houses/hotels first.
+
+
         int sellMortgagePrice;
         int n;
         boolean mortgageableProperties = true;
@@ -888,6 +892,7 @@ public class Game {
 
     private void isGameFinished() {
         if(players.size()<2){
+            System.out.println(players.get(0).getPlayerName() + " is the winner!");
             gameFinished = true;
         }
     }
