@@ -1,14 +1,11 @@
 import java.util.Stack;
 
 /**
- *
- * @author Kieran(132206), Oliver(134730), Vlad (146674)
+ * This class represents an individual game player.
+ * @author 132206, 134730, 146674
  *
  */
 
-/**
- * This class represents an individual game player.
- */
 public class Player {
     int money;
     int playerNo;
@@ -57,7 +54,6 @@ public class Player {
 
     /**
      * This method sets players money to the given param.
-     *
      * @param i The total value of "money" to set to the player.
      */
     public void setMoney(int i){
@@ -69,7 +65,8 @@ public class Player {
      * This method gives the player +200 money for passing go and sets the passed go boolean to true
      */
     private void passedGo() {
-        System.out.println("Player " + playerName + " has passed GO!"); // DEBUG
+
+        System.out.println("Player " + playerName + " has passed GO!");
         if(!passedGo) {
             passedGo = true;
         }
@@ -78,7 +75,6 @@ public class Player {
 
     /**
      * This method gets the current position of the player.
-     *
      * @return The position of the player.
      */
     public int getPosition(){
@@ -87,7 +83,6 @@ public class Player {
 
     /**
      * This method gets the total money the players owns.
-     *
      * @return The amount of money the player currently has.
      */
     public int getMoney(){
@@ -96,7 +91,6 @@ public class Player {
 
     /**
      * This method gets the players name.
-     *
      * @return The players name
      */
     public String getPlayerName(){
@@ -105,7 +99,6 @@ public class Player {
 
     /**
      * This method gets the player number.
-     *
      * @return The player number.
      */
     public int getPlayerNumber(){
@@ -114,8 +107,7 @@ public class Player {
 
     /**
      * This method gets the players token
-     *
-     * @return The players token.
+     * @return The player's Enumerated Token.
      */
     public Enum getPlayerToken(){
         return token;
@@ -123,7 +115,6 @@ public class Player {
 
     /**
      * This method returns a boolean value referring to whether the player is a human or a computer.
-     *
      * @return boolean value. true if computer, false if human.
      */
     public boolean isCPU(){
@@ -132,8 +123,7 @@ public class Player {
 
     /**
      * This method adds money to the players current amount of money.
-     *
-     * @param i The amount of money to add.
+     * @param int The amount of money to add.
      */
     void addMoney(int i) {
         money += i;
@@ -142,7 +132,7 @@ public class Player {
     /**
      * This method subtracts money from the players current amount of money.
      *
-     * @param i The total value of "money" to remove from the player.
+     * @param int The total value of "money" to remove from the player.
      */
     void payMoney(int i) {
         money -= i;
@@ -153,7 +143,7 @@ public class Player {
      * free the card is added to a card array inside player, otherwise the card is returned.
      *
      * @param deck The deck of cards to draw a card from.
-     * @return null if card is not get out of jail free. The card that was picked if not.
+     * @return Card object or null
      */
     public Card drawCard(Deck deck){
         Card card;
@@ -173,7 +163,6 @@ public class Player {
     /**
      * This method moves the player to a set location. It is used when the player needs to move to a specific location
      * without passing go, such as going to jail.
-     *
      * @param position The position the player is being moved to.
      */
     public void moveToPosition(int position) {
@@ -196,7 +185,6 @@ public class Player {
 
     /**
      * This method is used to "keep" the get out of jail free card.
-     *
      * @param card The get out of jail free card to be assigned to the player.
      */
     public void keepCard(Card card){
@@ -205,8 +193,7 @@ public class Player {
 
     /**
      * This method is used to "use" the get out of jail free card.
-     *
-     * @return card The get out of jail free card to be replaced at the bottom of the deck.
+     * @return Card The get out of jail free card to be replaced at the bottom of the deck.
      */
     public Card returnCard(){
         return heldCards.pop();

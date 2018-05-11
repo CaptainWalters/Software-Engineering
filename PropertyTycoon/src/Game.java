@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.Timer;
 
 /**
- *The Game class runs an instance of the classic game of property tycoon. It is responsible for initialising
+ * The Game class runs an instance of the classic game of property tycoon. It is responsible for initialising
  * the board, players, dice and cards.
  *
  */
@@ -381,8 +381,8 @@ public class Game {
                 JOptionPane.PLAIN_MESSAGE,
                 JOptionPane.QUESTION_MESSAGE,
                 null,
-                new Object[]{"Yes", "No"},
-                "Yes");
+                new Object[]{"Pay", "New Card"},
+                "Pay");
         if(n == -1){
             System.exit(0);
         }
@@ -400,17 +400,6 @@ public class Game {
             null,
             new Object[]{"Yes", "No"},
             "Yes");
-    }
-
-    private int undevelopLocationDialog(String locationName, int developmentPrice) {
-        return JOptionPane.showOptionDialog(null,
-                ("Would you like to sell a property on " + locationName + " for " + developmentPrice + "?"),
-                "Sell Location Asset",
-                JOptionPane.PLAIN_MESSAGE,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                new Object[]{"Yes", "No"},
-                "Yes");
     }
 
     //@132206
@@ -974,7 +963,6 @@ public class Game {
                 if( utils == 1) value = ( (dice[0]+dice[1]) * 4 );
                 // if 2, rent = 10x sum(dice)
                 if( utils == 2) value = ( (dice[0]+dice[1]) * 10 );
-                //System.out.println("[DEBUG] PLAYER: " + player.getPlayerName() + ", UTILITIES OWNED: " + utils + ",  DICE 0:" + dice[0] + ", DICE 1: " + dice[1] + ", VALUE: " + value);
 
                 System.out.println("Player " + currPlayer.getPlayerName() + " paid " + currLoc.getOwner().getPlayerName() + " the amount of " + value + " for landing on " + currLoc.getName());
                 currPlayer.payMoney(value);
@@ -1039,8 +1027,8 @@ public class Game {
                 break;
 
             case "select":
-                boolean option = true; // Default should be false, true during temporary debug!
-                if(option == true) {
+                int option = cardDialog(card);
+                if(option == 0) {
                     currPlayer.payMoney(value);
                 } else {
                     System.out.printf(currPlayer.getPlayerName() + ", Opportunity Knocks! ");
