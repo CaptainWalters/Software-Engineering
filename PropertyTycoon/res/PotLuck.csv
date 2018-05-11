@@ -1,0 +1,16 @@
+﻿You inherit £100,get,100
+You have won 2nd prize in a beauty contest; collect £20,get,20
+Go back to Crapper Street,jump,1
+Student loan refund. Collect £20,get,20
+Bank error in your favour. Collect £200,get,200
+Pay bill for text books of £100,pay,100
+Mega late night taxi bill pay £50,pay,50
+Advance to go,jump,0
+From sale of Bitcoin you get £50,get,50
+Pay a £10 fine or take opportunity knocks,free,10
+Pay insurance fee of £50,free,50
+Savings bond matures; collect £100,get,100
+Go to jail. Do not pass GO; do not collect £200,jump,99
+Received interest on shares of £25,get,25
+It's your birthday. Collect £10 from each player,collect,10
+Get out of jail free,multipass,1
