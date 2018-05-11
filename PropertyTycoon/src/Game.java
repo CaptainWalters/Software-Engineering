@@ -49,9 +49,9 @@ public class Game {
 
     /**
      * This method is used to set up the board, players, dice and cards.
-     * @throws IOException
+     *
      */
-    public void init() throws IOException {
+    public void init() {
         board = new Board(boardCSV);
         dice1 = new Dice();
         dice2 = new Dice();
@@ -108,7 +108,7 @@ public class Game {
                     if(board.board[j].getMortgaged()){
                         playerAssets += ( board.board[j].getPrice() / 2 );
                     } else {
-                        for(int numOfPropStart = 0; numOfPropStart<board.board[j].getNumberOfPropertiesBuilt(); numOfPropStart++) {
+                        for(int numOfPropStart = 0; numOfPropStart<board.board[j].getDevelopments(); numOfPropStart++) {
                             playerAssets += board.board[j].getHouseDevelopmentPrice();
                         }
                         playerAssets += board.board[j].getPrice();
@@ -425,23 +425,25 @@ public class Game {
     }
 
     //@146674
-    private void developLocation(Player player){
+    private void developLocation(Player currPlayer){
         // Method to offer player if they would like to purchase houses/hotel when all locations on colour are owned
-        if (player.passedGo) {
-            BoardLocation currLoc = board.board[player.getPosition()];
+        if (currPlayer.passedGo) {
+            BoardLocation currLoc = board.board[currPlayer.getPosition()];
 
-            if(!currLoc.canBuy()) return; // Shouldn't be able to develop a property you cannot own!
+            if(!currLoc.getCanBuy()) return; // Shouldn't be able to develop a property you cannot own!
             if(!currLoc.getAction().equals("")) return; // Ignore developing locations with actions (like Utils/Stations/FreeParking/etc.)
 
             int set = 3;// Set number of properties in colour
             if( currLoc.getColour().equals("deep blue") || currLoc.getColour().equals("brown") ) set = 2; // These colours only have two locations on board
 
-            if( board.getNumberOfLocationsOwnedByPlayerUsingColour(player, currLoc.getColour()) == set){ // Check player owns all properties in that colour
-                for(int numOfProps = currLoc.getNumberOfPropertiesBuilt(); numOfProps<5; numOfProps++ ){ // Loop through remaining undeveloped properties
+            if( board.getNumberOfLocationsOwnedByPlayerUsingColour(currPlayer, currLoc.getColour()) == set){ // Check player owns all properties in that colour
+
+                for( int numOfProps = currLoc.getDevelopments(); numOfProps<5; numOfProps++ ){ // Loop through remaining undeveloped properties
+
                     // Ask if player would like to purchase a house (and loop) or exit
-                    if(!player.isCPU){
+                    if(!currPlayer.isCPU){
                         if( developLocationDialog(currLoc.getName(), currLoc.getHouseDevelopmentPrice()) == 0 ) { // Dialog 'Yes' button pressed
-                            currLoc.buyHouse(player);
+                            currLoc.buyHouse(currPlayer);
                         } else {
                             return;// Dialog 'No' button pressed (exit loop)
                         }
@@ -450,8 +452,8 @@ public class Game {
                         int n;
                         Random rand = new Random();
                         n = rand.nextInt((1 - 0) + 1) + 0;
-                        if(n==1&&player.getMoney()>600) {
-                            currLoc.buyHouse(player);
+                        if(n==1&&currPlayer.getMoney()>600) {
+                            currLoc.buyHouse(currPlayer);
                         } else {
                             return;
                         }
@@ -481,7 +483,7 @@ public class Game {
     private void offerToBuy(Player player) {
         if (player.passedGo) {
             BoardLocation currLoc = board.board[player.getPosition()];
-            if (currLoc.canBuy() && !currLoc.isOwned() & (player.getMoney()>=currLoc.getPrice())) {
+            if (currLoc.getCanBuy() && !currLoc.isOwned() & (player.getMoney()>=currLoc.getPrice())) {
                 int n;
                 if(!player.isCPU) {
                     Object[] buyoptions = {"Yes", "No"};
@@ -518,7 +520,7 @@ public class Game {
                 } else if(player.getMoney()<currLoc.getRentPrice()){
                     //sellMortgageProperties(player, currLoc.getRentPrice()); // Currently disabled
                 }
-            } else if(currLoc.canBuy() && !currLoc.isOwned() && (player.getMoney()<currLoc.getPrice())){
+            } else if(currLoc.getCanBuy() && !currLoc.isOwned() && (player.getMoney()<currLoc.getPrice())){
                 System.out.println("You cannot afford to buy the location");
             }
         }
@@ -552,11 +554,11 @@ public class Game {
             if(playerProperties.get(i).getMortgaged()){
                 noOfMortgaged +=1;
                 mortgagePrice += ((playerProperties.get(i).getPrice())/2);
-                assetPrice += (playerProperties.get(i).getNumberOfPropertiesBuilt()*playerProperties.get(i).getHouseDevelopmentPrice()); // GET CORRECT PRICE FROM BASIC INCOME/HOUSE/HOTEL
+                assetPrice += (playerProperties.get(i).getDevelopments()*playerProperties.get(i).getHouseDevelopmentPrice()); // GET CORRECT PRICE FROM BASIC INCOME/HOUSE/HOTEL
             } else {
                 sellPrice += ((playerProperties.get(i).getPrice()));
             }
-            if(playerProperties.get(i).getNumberOfPropertiesBuilt()>0){
+            if(playerProperties.get(i).getDevelopments()>0){
                 playerHasAssets = true;
                 pPWithHouses.add(playerProperties.get(i));
             }
@@ -574,10 +576,10 @@ public class Game {
                 String[] tableData = new String[pPWithHouses.size()];
                 for (int i = 0; i < pPWithHouses.size() ; i++) {
                     System.out.println(pPWithHouses.get(i).getName());
-                    System.out.println(pPWithHouses.get(i).getNumberOfPropertiesBuilt());
-                    System.out.println(pPWithHouses.get(i).getNumberOfPropertiesBuilt()*pPWithHouses.get(i).getHouseDevelopmentPrice());
+                    System.out.println(pPWithHouses.get(i).getDevelopments());
+                    System.out.println(pPWithHouses.get(i).getDevelopments()*pPWithHouses.get(i).getHouseDevelopmentPrice());
                     Object[] data = new Object[] { "test", "test", "test"};
-                    tableData[i] = pPWithHouses.get(i).getName() + " has " + pPWithHouses.get(i).getNumberOfPropertiesBuilt()+ " assest/s worth: " + pPWithHouses.get(i).getNumberOfPropertiesBuilt()*pPWithHouses.get(i).getHouseDevelopmentPrice();
+                    tableData[i] = pPWithHouses.get(i).getName() + " has " + pPWithHouses.get(i).getDevelopments()+ " assest/s worth: " + pPWithHouses.get(i).getDevelopments()*pPWithHouses.get(i).getHouseDevelopmentPrice();
 
                 }
 
