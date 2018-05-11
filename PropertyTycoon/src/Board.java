@@ -10,9 +10,13 @@ import java.util.ArrayList;
 public class Board {
      BoardLocation[] board;
 
-     public Board(File file) throws IOException {
+     public Board(File file) {
          board = new BoardLocation[41];
-         populateBoard(file);
+         try {
+             populateBoard(file);
+         } catch (IOException e) {
+            e.printStackTrace();
+         }
      }
 
      public String getInfo (int position){
@@ -35,7 +39,7 @@ public class Board {
         for (BoardLocation location : board) // Loop through board
             if( location.isOwned() )
                if( location.getOwner().equals(player) )
-                   out += (location.numberOfPropertiesBuilt() < 5) ? location.numberOfPropertiesBuilt():0; // Adds number of Houses and ignores Hotels
+                   out += (location.getDevelopments() < 5) ? location.getDevelopments():0; // Adds number of Houses and ignores Hotels
         return out;
      }
      
@@ -45,7 +49,7 @@ public class Board {
         for (BoardLocation location : board) // Loop through board
             if( location.isOwned() )
                if( location.getOwner().equals(player) )
-                   out += (location.numberOfPropertiesBuilt() == 5) ? 1:0; // Adds one if hotel found, zero otherwise
+                   out += (location.getDevelopments() == 5) ? 1:0; // Adds one if hotel found, zero otherwise
         return out;
      }
      

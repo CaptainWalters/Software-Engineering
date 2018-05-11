@@ -5,7 +5,6 @@
  */
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,9 +49,9 @@ public class Game {
 
     /**
      * This method is used to set up the board, players, dice and cards.
-     * @throws IOException
+     *
      */
-    public void init() throws IOException {
+    public void init() {
         board = new Board(boardCSV);
         dice1 = new Dice();
         dice2 = new Dice();
@@ -419,14 +418,14 @@ public class Game {
         if (player.passedGo) {
             BoardLocation currLoc = board.board[player.getPosition()];
 
-            if(!currLoc.canBuy()) return; // Shouldn't be able to develop a property you cannot own!
+            if(!currLoc.getCanBuy()) return; // Shouldn't be able to develop a property you cannot own!
             if(!currLoc.getAction().equals("")) return; // Ignore developing locations with actions (like Utils/Stations/FreeParking/etc.)
 
             int set = 3;// Set number of properties in colour
             if( currLoc.getColour().equals("deep blue") || currLoc.getColour().equals("brown") ) set = 2; // These colours only have two locations on board
 
             if( board.getNumberOfLocationsOwnedByPlayerUsingColour(player, currLoc.getColour()) == set){ // Check player owns all properties in that colour
-                for( int numOfProps = currLoc.numberOfPropertiesBuilt(); numOfProps<5; numOfProps++ ){ // Loop through remaining undeveloped properties
+                for( int numOfProps = currLoc.getDevelopments(); numOfProps<5; numOfProps++ ){ // Loop through remaining undeveloped properties
                     // Ask if player would like to purchase a house (and loop) or exit
                     if(!player.isCPU){
                         if( developLocationDialog(currLoc.getName(), currLoc.getHouseDevelopmentPrice()) == 0 ) { // Dialog 'Yes' button pressed
@@ -454,7 +453,7 @@ public class Game {
     private void offerToBuy(Player player) {
         if (player.passedGo) {
             BoardLocation currLoc = board.board[player.getPosition()];
-            if (currLoc.canBuy() && !currLoc.isOwned() & (player.getMoney()>=currLoc.getPrice())) {
+            if (currLoc.getCanBuy() && !currLoc.isOwned() & (player.getMoney()>=currLoc.getPrice())) {
                 int n;
                 if(!player.isCPU) {
                     Object[] buyoptions = {"Yes", "No"};
@@ -491,7 +490,7 @@ public class Game {
                 } else if(player.getMoney()<currLoc.getRentPrice()){
                     //sellMortgageProperties(player, currLoc.getRentPrice());
                 }
-            } else if(currLoc.canBuy() && !currLoc.isOwned() && (player.getMoney()<currLoc.getPrice())){
+            } else if(currLoc.getCanBuy() && !currLoc.isOwned() && (player.getMoney()<currLoc.getPrice())){
                 System.out.println("You cannot afford to buy the location");
             }
         }
