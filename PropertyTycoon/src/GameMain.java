@@ -1,10 +1,4 @@
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
-
 import javax.swing.*;
-import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -13,17 +7,19 @@ import java.util.ArrayList;
  * @author Kieran(132206), Oliver(134730), Vlad (146674)
  *
  */
+
+/**
+ * This class gets the main inputs required from the players, such as whether to allow trading, player names and tokens
+ * etc.
+ */
 public class GameMain{
 
 
     public static void main(String[] args) throws IOException {
-        ImageIcon img = new ImageIcon("//res/logo.png");
         int totalPlayers = 0;
         ArrayList<Player> players = new ArrayList<>();
         int timer = 0;
 
-
-        //choose game type
         JCheckBox checkBox1 = new JCheckBox("Abridged?");
         JCheckBox checkBox2 = new JCheckBox("Allow Trading?");
         Object[] sMessage = {"Please choose a game type:", checkBox1, checkBox2};
@@ -110,14 +106,12 @@ public class GameMain{
                     etoken = Token.Smartphone;
                     players.add(new Player(i, pname.getText(), etoken, cpuChoice));
                 }
-
                 pname.setText("");
                 token.removeItem(token.getSelectedItem());
             }
 
         }
 
-        Game game = new Game(players, trading, abridged, timer); // MODEL (Data&Logic)
-
+        Game game = new Game(players, trading, abridged, timer);
     }
 }
