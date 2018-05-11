@@ -5,7 +5,6 @@
  */
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -95,6 +94,7 @@ public class Game {
     }
 
     //132206
+    //TODO: needs testing and changing
     private void endGame() {
         int[] playerValue = new int[players.size()];
         int maxValue = 0;
@@ -105,7 +105,14 @@ public class Game {
             int playerAssets = 0;
             for (int j = 0; j < 40; j++) {
                 if (board.board[j].getOwner() == players.get(i)) {
-                    playerAssets += board.board[j].getPrice();
+                    if(board.board[j].getMortgaged()){
+                        playerAssets += ( board.board[j].getPrice() / 2 );
+                    } else {
+                        for(int numOfPropStart = 0; numOfPropStart<board.board[j].getNumberOfPropertiesBuilt(); numOfPropStart++) {
+                            playerAssets += board.board[j].getHouseDevelopmentPrice();
+                        }
+                        playerAssets += board.board[j].getPrice();
+                    }
                 }
             }
             playerValue[i] = playerAssets+players.get(i).getMoney();
@@ -115,7 +122,8 @@ public class Game {
             if(playerValue[e]>maxValue){
                 maxValue = playerValue[e];
                 maxPlayerIndex = e;
-            } if (playerValue[e] == maxValue){
+            }
+            if (playerValue[e] == maxValue){
                 tiedWinner = true;
             }
         }
@@ -422,7 +430,7 @@ public class Game {
             if( currLoc.getColour().equals("deep blue") || currLoc.getColour().equals("brown") ) set = 2; // These colours only have two locations on board
 
             if( board.getNumberOfLocationsOwnedByPlayerUsingColour(player, currLoc.getColour()) == set){ // Check player owns all properties in that colour
-                for( int numOfProps = currLoc.numberOfPropertiesBuilt(); numOfProps<5; numOfProps++ ){ // Loop through remaining undeveloped properties
+                for(int numOfProps = currLoc.getNumberOfPropertiesBuilt(); numOfProps<5; numOfProps++ ){ // Loop through remaining undeveloped properties
                     // Ask if player would like to purchase a house (and loop) or exit
                     if(!player.isCPU){
                         if( developLocationDialog(currLoc.getName(), currLoc.getHouseDevelopmentPrice()) == 0 ) { // Dialog 'Yes' button pressed
@@ -493,105 +501,112 @@ public class Game {
         }
     }
 
-//    private void sellMortgageProperties(Player player, int rentPrice) {
-//
-//        //TODO Sell houses/hotels first.
-//
-//
-//        int sellMortgagePrice;
-//        int n;
-//        boolean mortgageableProperties = true;
-//        boolean sellableProperties = true;
-//        boolean playerHasAssets = false;
-//        int noOfMortgaged = 0;
-//        int mortgagePrice = 0;
-//        int sellPrice = 0;
-//        int assetPrice = 0;
-//        ArrayList<BoardLocation> playerProperties = board.getLocationsOwnedByPlayer(player);
-//        ArrayList<BoardLocation> pPWithHouses = new ArrayList<>();
-//
-//        for(int i = 0; i< playerProperties.size(); i++){
-//            if(playerProperties.get(i).getMortgaged()){
-//                noOfMortgaged +=1;
-//                mortgagePrice += ((playerProperties.get(i).getPrice())/2);
-//                assetPrice += (playerProperties.get(i).numberOfPropertiesBuilt()*playerProperties.get(i).getHouseDevelopmentPrice());
-//            } else {
-//                sellPrice += ((playerProperties.get(i).getPrice()));
-//            }
-//            if(playerProperties.get(i).numberOfPropertiesBuilt()>0){
-//                playerHasAssets = true;
-//                pPWithHouses.add(playerProperties.get(i));
-//            }
-//        }
-//
-//        if(playerHasAssets){
-//            if(playerHasAssets&&(sellPrice+mortgagePrice>rentPrice)){
-//                int j = 2;
-//                if(!player.isCPU()) {
-//                    j = JOptionPane.showConfirmDialog(null, "Would you like to sell any houses or hotels?", "Game type selection.", JOptionPane.YES_NO_OPTION);
-//                } else {
-//
-//                }
-//                DefaultTableModel dtm = new DefaultTableModel();
-//                String[] tableData = new String[pPWithHouses.size()];
-//                for (int i = 0; i < pPWithHouses.size() ; i++) {
-//                    System.out.println(pPWithHouses.get(i).getName());
-//                    System.out.println(pPWithHouses.get(i).numberOfPropertiesBuilt());
-//                    System.out.println(pPWithHouses.get(i).numberOfPropertiesBuilt()*pPWithHouses.get(i).getHouseDevelopmentPrice());
-//                    Object[] data = new Object[] { "test", "test", "test"};
-//                    tableData[i] = pPWithHouses.get(i).getName() + " has " + pPWithHouses.get(i).numberOfPropertiesBuilt()+ " assest/s worth: " + pPWithHouses.get(i).numberOfPropertiesBuilt()*pPWithHouses.get(i).getHouseDevelopmentPrice();
-//
-//                }
-//
-//
-//                JList pList = new JList(tableData);
-//
-//                String header[] = new String[] {"Location", "Number of houses", "Value of assets"};
-//                dtm.setColumnIdentifiers(header);
-//
-//
-//
-//
-//                //ask on which location do you want to sell assets
-//                //cpu to sell assests from lowest to highest earning.
-//                //can afford rent just by selling assets
-//                Object[] message = {"You must sell X houses/hotels to afford rent", pList};
-//                JOptionPane.showMessageDialog(null, message,"You need some money!",JOptionPane.DEFAULT_OPTION);
-//            }
-//                //cant afford rent by only selling assets
-//                //must sell assets and sell/mortgage properties
-//
-//        }
-//
-//        if(rentPrice<mortgagePrice) {
-//            if(!player.isCPU) {
-//                n = sellMortgageDialog("You owe somebody rent of: " + rentPrice + " but you only have " + player.getMoney() + ". Would you like to sell or mortgage your properties?");
-//            } else {
-//                n = 0;
-//            }
-//        } else if(rentPrice<sellPrice){
-//            n=1;
-//        } else {
-//            for(int i = 0; i<playerProperties.size();i++){
-//                playerProperties.get(i).setOwner(null);
-//            }
-//            int e = JOptionPane.showConfirmDialog(null, (player.getPlayerName()) + " is bankrupt! They are no longer playing.", "Bankrupt Player.", JOptionPane.DEFAULT_OPTION);
-//            players.remove(player);
-//            noOfPlayers -= 1;
-//            isGameFinished();
-//            n=-2;
-//        }
-//
-//
-//        //RANDOM CHOICE FOR CPU????
-//        if(n == 0){
-//            //do sell
-//        } else if ( n == 1){
-//            //do mortgage
-//
-//    } else {
-//        }
-//    }
+    private void sellMortgageProperties(Player player, int rentPrice) {
+
+        //TODO Sell houses/hotels first.
+        int sellMortgagePrice;
+        int n;
+        boolean mortgageableProperties = true;
+        boolean sellableProperties = true;
+        boolean playerHasAssets = false;
+        int noOfMortgaged = 0;
+        int mortgagePrice = 0;
+        int sellPrice = 0;
+        int assetPrice = 0;
+        ArrayList<BoardLocation> playerProperties = board.getLocationsOwnedByPlayer(player);
+        ArrayList<BoardLocation> pPWithHouses = new ArrayList<>();
+
+
+        // GIVE OPTION TO SELL __ALL__ LOCATION ASSETS
+        // GIVE OPTION TO MORTGAGE
+        // COMPARE TO TOTAL VALUE OF MORT. + ALL ASSETS > current RENT PRICE
+        // SEE IF THIS WORKS WITH AUCTION????
+
+
+
+
+        for(int i = 0; i< playerProperties.size(); i++){
+            if(playerProperties.get(i).getMortgaged()){
+                noOfMortgaged +=1;
+                mortgagePrice += ((playerProperties.get(i).getPrice())/2);
+                assetPrice += (playerProperties.get(i).getNumberOfPropertiesBuilt()*playerProperties.get(i).getHouseDevelopmentPrice()); // GET CORRECT PRICE FROM BASIC INCOME/HOUSE/HOTEL
+            } else {
+                sellPrice += ((playerProperties.get(i).getPrice()));
+            }
+            if(playerProperties.get(i).getNumberOfPropertiesBuilt()>0){
+                playerHasAssets = true;
+                pPWithHouses.add(playerProperties.get(i));
+            }
+        }
+
+        if(playerHasAssets){
+            if(playerHasAssets&&(sellPrice+mortgagePrice>rentPrice)){
+                int j = 2;
+                if(!player.isCPU()) {
+                    j = JOptionPane.showConfirmDialog(null, "Would you like to sell any houses or hotels?", "Game type selection.", JOptionPane.YES_NO_OPTION);
+                } else {
+
+                }
+
+                String[] tableData = new String[pPWithHouses.size()];
+                for (int i = 0; i < pPWithHouses.size() ; i++) {
+                    System.out.println(pPWithHouses.get(i).getName());
+                    System.out.println(pPWithHouses.get(i).getNumberOfPropertiesBuilt());
+                    System.out.println(pPWithHouses.get(i).getNumberOfPropertiesBuilt()*pPWithHouses.get(i).getHouseDevelopmentPrice());
+                    Object[] data = new Object[] { "test", "test", "test"};
+                    tableData[i] = pPWithHouses.get(i).getName() + " has " + pPWithHouses.get(i).getNumberOfPropertiesBuilt()+ " assest/s worth: " + pPWithHouses.get(i).getNumberOfPropertiesBuilt()*pPWithHouses.get(i).getHouseDevelopmentPrice();
+
+                }
+
+
+                JList pList = new JList(tableData);
+
+                String header[] = new String[] {"Location", "Number of houses", "Value of assets"};
+
+
+
+
+
+                //ask on which location do you want to sell assets
+                //cpu to sell assests from lowest to highest earning.
+                //can afford rent just by selling assets
+                Object[] message = {"You must sell X houses/hotels to afford rent", pList};
+                JOptionPane.showMessageDialog(null, message,"You need some money!",JOptionPane.DEFAULT_OPTION);
+            }
+                //cant afford rent by only selling assets
+                //must sell assets and sell/mortgage properties
+
+        }
+
+        if(rentPrice<mortgagePrice) {
+            if(!player.isCPU) {
+                n = sellMortgageDialog("You owe somebody rent of: " + rentPrice + " but you only have " + player.getMoney() + ". Would you like to sell or mortgage your properties?");
+            } else {
+                n = 0;
+            }
+        } else if(rentPrice<sellPrice){
+            n=1;
+        } else {
+            for(int i = 0; i<playerProperties.size();i++){
+                playerProperties.get(i).setOwner(null);
+            }
+            int e = JOptionPane.showConfirmDialog(null, (player.getPlayerName()) + " is bankrupt! They are no longer playing.", "Bankrupt Player.", JOptionPane.DEFAULT_OPTION);
+            players.remove(player);
+            noOfPlayers -= 1;
+            isGameFinished();
+            n=-2;
+        }
+
+
+        //RANDOM CHOICE FOR CPU????
+        if(n == 0){
+            //do sell
+        } else if ( n == 1){
+            //do mortgage
+
+    } else {
+        }
+    }
 
     //@132206
     // Creates an auction if they player declines to buy property.

@@ -35,7 +35,7 @@ public class Board {
         for (BoardLocation location : board) // Loop through board
             if( location.isOwned() )
                if( location.getOwner().equals(player) )
-                   out += (location.numberOfPropertiesBuilt() < 5) ? location.numberOfPropertiesBuilt():0; // Adds number of Houses and ignores Hotels
+                   out += (location.getNumberOfPropertiesBuilt() < 5) ? location.getNumberOfPropertiesBuilt():0; // Adds number of Houses and ignores Hotels
         return out;
      }
      
@@ -45,7 +45,7 @@ public class Board {
         for (BoardLocation location : board) // Loop through board
             if( location.isOwned() )
                if( location.getOwner().equals(player) )
-                   out += (location.numberOfPropertiesBuilt() == 5) ? 1:0; // Adds one if hotel found, zero otherwise
+                   out += (location.getNumberOfPropertiesBuilt() == 5) ? 1:0; // Adds one if hotel found, zero otherwise
         return out;
      }
      

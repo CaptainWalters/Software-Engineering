@@ -89,7 +89,7 @@ public class BoardLocation {
      }
      
      //@146674
-     public int numberOfPropertiesBuilt(){
+     public int getNumberOfPropertiesBuilt(){
          return this.propertyType;
      }
       
