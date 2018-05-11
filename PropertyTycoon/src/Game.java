@@ -381,8 +381,8 @@ public class Game {
                 JOptionPane.PLAIN_MESSAGE,
                 JOptionPane.QUESTION_MESSAGE,
                 null,
-                new Object[]{"Yes", "No"},
-                "Yes");
+                new Object[]{"Pay", "New Card"},
+                "Pay");
         if(n == -1){
             System.exit(0);
         }
@@ -400,17 +400,6 @@ public class Game {
             null,
             new Object[]{"Yes", "No"},
             "Yes");
-    }
-
-    private int undevelopLocationDialog(String locationName, int developmentPrice) {
-        return JOptionPane.showOptionDialog(null,
-                ("Would you like to sell a property on " + locationName + " for " + developmentPrice + "?"),
-                "Sell Location Asset",
-                JOptionPane.PLAIN_MESSAGE,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                new Object[]{"Yes", "No"},
-                "Yes");
     }
 
     //@132206
@@ -466,36 +455,6 @@ public class Game {
                         } else {
                             return;
                         }
-                    }
-                }
-            }
-        }
-    }
-
-    //@146674
-    private void sellDevelopedLocationAssets(Player currPlayer, BoardLocation currLoc){
-        // Method to offer player if they would like to sell houses/hotel
-        if (currPlayer.passedGo) {
-            if(!currLoc.canBuy()) return; // Shouldn't be able to develop a property you cannot own!
-            if(!currLoc.getAction().equals("")) return; // Ignore developing locations with actions (like Utils/Stations/FreeParking/etc.)
-
-            for(int numOfProps = currLoc.getNumberOfPropertiesBuilt(); numOfProps>0; numOfProps-- ){ // Loop through remaining undeveloped properties
-                // Ask if player would like to purchase a house (and loop) or exit
-                if(!currPlayer.isCPU){
-                    if( undevelopLocationDialog(currLoc.getName(), currLoc.getHouseDevelopmentPrice()) == 0 ) { // Dialog 'Yes' button pressed
-                        currLoc.sellHouse(currPlayer);
-                    } else {
-                        return;// Dialog 'No' button pressed (exit loop)
-                    }
-                } else {
-                    // CPU DEVELOP if money is above 600
-                    int n;
-                    Random rand = new Random();
-                    n = rand.nextInt((1 - 0) + 1) + 0;
-                    if(n==1&&currPlayer.getMoney()<600) {
-                        currLoc.sellHouse(currPlayer);
-                    } else {
-                        return;
                     }
                 }
             }
@@ -1002,7 +961,6 @@ public class Game {
                 if( utils == 1) value = ( (dice[0]+dice[1]) * 4 );
                 // if 2, rent = 10x sum(dice)
                 if( utils == 2) value = ( (dice[0]+dice[1]) * 10 );
-                //System.out.println("[DEBUG] PLAYER: " + player.getPlayerName() + ", UTILITIES OWNED: " + utils + ",  DICE 0:" + dice[0] + ", DICE 1: " + dice[1] + ", VALUE: " + value);
 
                 System.out.println("Player " + currPlayer.getPlayerName() + " paid " + currLoc.getOwner().getPlayerName() + " the amount of " + value + " for landing on " + currLoc.getName());
                 currPlayer.payMoney(value);
@@ -1067,8 +1025,8 @@ public class Game {
                 break;
 
             case "select":
-                boolean option = true; // Default should be false, true during temporary debug!
-                if(option == true) {
+                int option = cardDialog(card);
+                if(option == 0) {
                     currPlayer.payMoney(value);
                 } else {
                     System.out.printf(currPlayer.getPlayerName() + ", Opportunity Knocks! ");

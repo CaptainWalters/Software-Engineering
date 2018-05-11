@@ -31,7 +31,6 @@ public class BoardLocation {
          this.canBuy = canBuy;
          this.owner = null;
          this.mortgaged = false;
-         System.out.println(toString()); // DEBUG
      }
 
      //@146674
