@@ -193,23 +193,9 @@ public class Game {
                         }
                         if (diceRoll[0] == diceRoll[1]) {
                             if(!currPlayer.isCPU) {
-                                jailDialog("You rolled three doubles in a row, your going to jail!");
+                                jailDialog("You rolled three doubles in a row, you're going to jail!");
                             }
-                            if (!currPlayer.heldCards.empty()) {
-                                Card card = currPlayer.heldCards.pop();
-                                if (card.getValue() == 1) {
-                                    potLuck.addCard(card);
-                                } else if (card.getValue() == 2) {
-                                    opportunityKnocks.addCard(card);
-                                }
-                                System.out.println(currPlayer.getPlayerName() + " used their get out of jail free card.");
-                                currPlayer.inJail = false;
-                                currPlayer.moveToPosition(10);
-                                System.out.println(currPlayer.getPlayerName() + " you landed on " + board.board[currPlayer.getPosition()].getName());
-                                nextTurn(noOfPlayers);
-                            } else {
-                               toJail(currPlayer);
-                            }
+                            toJail(currPlayer);
                         } else {
                             currPlayer.movePosition(diceRoll[0] + diceRoll[1]);
                             System.out.println(currPlayer.getPlayerName() + " you landed on " + board.board[currPlayer.getPosition()].getName());
@@ -250,20 +236,34 @@ public class Game {
     }
 
     public void toJail(Player currPlayer){
-        int n;
-        if(!currPlayer.isCPU) {
-            n = payJailDialog(currPlayer.getPlayerName());
-        } else {
-            Random rand = new Random();
-            n = rand.nextInt((1 - 0) + 1) + 0;
-        }
-        if (n == 0) {
-            payJail(currPlayer, 50);
-        } else if (n == 1) {
-            jailTurnCounter.put(currPlayer, 0);
-            currPlayer.moveToPosition(40);
+        if (!currPlayer.heldCards.empty()) {
+            Card card = currPlayer.heldCards.pop();
+            if (card.getValue() == 1) {
+                potLuck.addCard(card);
+            } else if (card.getValue() == 2) {
+                opportunityKnocks.addCard(card);
+            }
+            System.out.println(currPlayer.getPlayerName() + " used their get out of jail free card.");
+            currPlayer.inJail = false;
+            currPlayer.moveToPosition(10);
             System.out.println(currPlayer.getPlayerName() + " you landed on " + board.board[currPlayer.getPosition()].getName());
-            currPlayer.setInJail();
+            nextTurn(noOfPlayers);
+        } else {
+            int n;
+            if(!currPlayer.isCPU) {
+                n = payJailDialog(currPlayer.getPlayerName());
+            } else {
+                Random rand = new Random();
+                n = rand.nextInt((1 - 0) + 1) + 0;
+            }
+            if (n == 0) {
+                payJail(currPlayer, 50);
+            } else if (n == 1) {
+                jailTurnCounter.put(currPlayer, 0);
+                currPlayer.moveToPosition(40);
+                System.out.println(currPlayer.getPlayerName() + " you landed on " + board.board[currPlayer.getPosition()].getName());
+                currPlayer.setInJail();
+            }
         }
     }
 
