@@ -100,9 +100,7 @@ public class Player {
         }
     }
 
-    public void moveToPosition(int position) {
-        this.position = position;
-    }
+    public void moveToPosition(int position) { this.position = position; }
 
     public void setInJail(){
         inJail = true;

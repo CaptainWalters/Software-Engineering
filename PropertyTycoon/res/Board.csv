@@ -38,4 +38,4 @@
 37,Hawking Way,350,35,175,500,1100,1300,1500,deep blue,,TRUE
 38,Super Tax,0,0,0,0,0,0,0,,taxSuper,FALSE
 39,Turing Heights,400,50,200,600,1400,1700,2000,deep blue,,TRUE
-99,Jail,0,0,0,0,0,0,0,jail,jail_actions,FALSE
+40,Jail,0,0,0,0,0,0,0,jail,jail_actions,FALSE

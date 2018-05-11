@@ -153,6 +153,9 @@ public class Game {
         while(!gameFinished) {
             Player currPlayer = players.get(currentTurn);
             String playerName = currPlayer.getPlayerName();
+
+            checkBankrupt(currPlayer);
+
             //1st roll
             if(!currPlayer.inJail) {
                 if(!currPlayer.isCPU){
@@ -399,6 +402,17 @@ public class Game {
             "Yes");
     }
 
+    private int undevelopLocationDialog(String locationName, int developmentPrice) {
+        return JOptionPane.showOptionDialog(null,
+                ("Would you like to sell a property on " + locationName + " for " + developmentPrice + "?"),
+                "Sell Location Asset",
+                JOptionPane.PLAIN_MESSAGE,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                new Object[]{"Yes", "No"},
+                "Yes");
+    }
+
     //@132206
     private boolean jailCheck(Player currPlayer){
         boolean inJail = false;
@@ -458,6 +472,52 @@ public class Game {
         }
     }
 
+    //@146674
+    private void sellDevelopedLocationAssets(Player currPlayer, BoardLocation currLoc){
+        // Method to offer player if they would like to sell houses/hotel
+        if (currPlayer.passedGo) {
+            if(!currLoc.canBuy()) return; // Shouldn't be able to develop a property you cannot own!
+            if(!currLoc.getAction().equals("")) return; // Ignore developing locations with actions (like Utils/Stations/FreeParking/etc.)
+
+            for(int numOfProps = currLoc.getNumberOfPropertiesBuilt(); numOfProps>0; numOfProps-- ){ // Loop through remaining undeveloped properties
+                // Ask if player would like to purchase a house (and loop) or exit
+                if(!currPlayer.isCPU){
+                    if( undevelopLocationDialog(currLoc.getName(), currLoc.getHouseDevelopmentPrice()) == 0 ) { // Dialog 'Yes' button pressed
+                        currLoc.sellHouse(currPlayer);
+                    } else {
+                        return;// Dialog 'No' button pressed (exit loop)
+                    }
+                } else {
+                    // CPU DEVELOP if money is above 600
+                    int n;
+                    Random rand = new Random();
+                    n = rand.nextInt((1 - 0) + 1) + 0;
+                    if(n==1&&currPlayer.getMoney()<600) {
+                        currLoc.sellHouse(currPlayer);
+                    } else {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    //@146674
+    public void checkBankrupt(Player currPlayer){
+        if(currPlayer.passedGo) {
+            if (board.getLocationsOwnedByPlayer(currPlayer).size() == 0 && currPlayer.getMoney() <= 1) {
+                System.out.println(currPlayer.getPlayerName() + " has become bankrupt!");
+                for(BoardLocation location : board.board){
+                    if( location.getOwner().equals(currPlayer)){
+                        location.setOwner(null); // Release all locations owned by player
+                    }
+                }
+                players.remove(currPlayer);
+                noOfPlayers--;
+            }
+        }
+    }
+
     //@146674 Edited/modified below
     private void offerToBuy(Player player) {
         if (player.passedGo) {
@@ -497,7 +557,7 @@ public class Game {
                     player.payMoney( currLoc.getRentPrice() ); // Take rent money from current player
                     currLoc.getOwner().addMoney( currLoc.getRentPrice() ); // Add rent money to landlord
                 } else if(player.getMoney()<currLoc.getRentPrice()){
-                    //sellMortgageProperties(player, currLoc.getRentPrice());
+                    //sellMortgageProperties(player, currLoc.getRentPrice()); // Currently disabled
                 }
             } else if(currLoc.canBuy() && !currLoc.isOwned() && (player.getMoney()<currLoc.getPrice())){
                 System.out.println("You cannot afford to buy the location");
@@ -544,7 +604,7 @@ public class Game {
         }
 
         if(playerHasAssets){
-            if(playerHasAssets&&(sellPrice+mortgagePrice>rentPrice)){
+            if( playerHasAssets && (sellPrice+mortgagePrice>rentPrice) ){
                 int j = 2;
                 if(!player.isCPU()) {
                     j = JOptionPane.showConfirmDialog(null, "Would you like to sell any houses or hotels?", "Game type selection.", JOptionPane.YES_NO_OPTION);
@@ -904,9 +964,9 @@ public class Game {
 
             // Pot Luck card action
             case "doPLCard":
-                System.out.printf(currPlayer.getPlayerName() + ", Pot Luck! ");
                 held = currPlayer.drawCard(potLuck);
                 if(held != null) {
+                    System.out.println(currPlayer.getPlayerName() + ", Pot Luck! ");
                     cardAction(currPlayer, held, dice);
                     potLuck.addCard(held);
                     return true;
@@ -915,9 +975,9 @@ public class Game {
 
             // Opportunity Knocks card action
             case "doOKCard":
-                System.out.printf(currPlayer.getPlayerName() + ", Opportunity Knocks! ");
                 held = currPlayer.drawCard(opportunityKnocks);
                 if(held != null) {
+                    System.out.println(currPlayer.getPlayerName() + ", Opportunity Knocks! ");
                     cardAction(currPlayer, held, dice);
                     opportunityKnocks.addCard(held);
                     return true;
@@ -985,21 +1045,26 @@ public class Game {
         switch(action) {
             case "get":
                 currPlayer.addMoney(value);
+                break;
             
             case "pay":
                 currPlayer.payMoney(value);
+                break;
             
             case "free":
                 currPlayer.payMoney(value);
                 addFreeParking(value);
+                break;
 
             case "jump":
                 currPlayer.moveToPosition(value);
                 //doAction( player, dice ); // Executes wherever player lands
+                break;
 
             case "move":
                 currPlayer.movePosition(-3); // Can we move back like this???
                 doAction( currPlayer, dice ); // Executes wherever player lands
+                break;
 
             case "select":
                 boolean option = true; // Default should be false, true during temporary debug!
@@ -1013,6 +1078,7 @@ public class Game {
                         opportunityKnocks.addCard(held);
                     }
                 }
+                break;
 
             case "collect":
                 int num = currPlayer.getPlayerNumber();
@@ -1026,6 +1092,7 @@ public class Game {
                     }
                 }
                 currPlayer.addMoney(collection);
+                break;
 
             case "repair":
                 int houses = board.getNumberOfHousesDevelopedByPlayer(currPlayer);
@@ -1036,12 +1103,11 @@ public class Game {
                 if( value == 40) repairCost = (40 * houses) + (115 * hotels);
                 System.out.println("Player " + currPlayer.getPlayerName() + "has paid a total of " + repairCost + " in repair costs.");
                 currPlayer.payMoney(repairCost);
-
-            case "multipass": // Get out of jail free card (The 5th Element reference)
-
+                break;
 
             case "jail": // Currently just sending people to GoToJail location (using jump 30) [FIX!!!]
                 toJail(currPlayer);
+                break;
 
             default:
                 System.out.println("NO ACTION!" + action);
