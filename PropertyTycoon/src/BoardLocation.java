@@ -42,7 +42,7 @@ public class BoardLocation {
         this.canBuy = canBuy;
         this.owner = null;
         this.mortgaged = false;
-        System.out.println(toString()); // DEBUG
+        //System.out.println(toString()); // DEBUG
     }
 
     /**
@@ -222,18 +222,22 @@ public class BoardLocation {
      *
      * @param player The player that is buying a house.
      */
-    public Boolean buyHouse(Player player){
-
+    public Boolean buyHouse(Player player) {
         // check if this location is maxed out with houses
-        if( this.developments >= 5 )
+        if (this.developments >= 5){
             return false;
-         
+        }
         // Only pay the bank
         player.payMoney( getHouseDevelopmentPrice() ); // this should be checked if true (player has enough money) before incrementing
         this.developments++; // Add a house
         System.out.println("Player " + player.getPlayerName() + " has built " + this.developments + " house(s) on " + this.getName());
         return true;
     }
+
+     //@146674
+     public Boolean canBuy(){
+         return this.canBuy;
+     }
 
     /**
      * This method sets the mortgaged value to true.

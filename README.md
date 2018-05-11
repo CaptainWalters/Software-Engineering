@@ -2,20 +2,10 @@
 2018 Software Engineering project
 
 # To-Do
--Implementation to choose number of players (currently works by hard coding the players) - noOfPlayers needs to be present for nextTurn to work. 
+Fix Mortgage
 
-takeTurn iterates through an arraylist of players, checking to see whether doubles are thrown, if three are thrown the player goes to jail (currently space 99 on board)
+Complete bankruptcy
 
--- Trading system
+Refactor whole project
 
--- Go to Jail
-
--- Jail system
-
--- if rent cannot be paid then mortgage or sell to bank
-
--- bankruptcy
-
--- Graphical Interface coming soon!(tm)
-
-MORE TO COME
+Begin documenting using JavaDoc notation
