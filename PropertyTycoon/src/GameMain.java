@@ -2,19 +2,18 @@ import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
 /**
- * @author Kieran(132206), Oliver(134730), Vlad (146674)
- *
- */
-
-/**
- * This class gets the main inputs required from the players, such as whether to allow trading, player names and tokens
+ * This Class contains the main method for executing and operating the Property Tycoon game. This class gets the main inputs required from the players, such as whether to allow trading, player names and tokens
  * etc.
+ * @author 132206, 134730, 146674
  */
+
 public class GameMain{
 
-
+    /**
+     * The main() method
+     * @param String[] Command-line/Program Arguments/Parameters
+     */
     public static void main(String[] args) throws IOException {
         int totalPlayers = 0;
         ArrayList<Player> players = new ArrayList<>();

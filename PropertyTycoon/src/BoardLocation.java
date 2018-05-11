@@ -1,12 +1,9 @@
 /**
- *
- * @author Kieran(132206), Oliver(134730), Vlad (146674)
+ * This class represents the individual location of the board. Such as Go, Properties, Pot luck etc.
+ * @author 132206, 134730, 146674
  *
  */
 
-/**
- * This class represents the individual location of the board. Such as Go, Properties, Pot luck etc.
- */
 public class BoardLocation {
 
     private final int position;
@@ -21,7 +18,7 @@ public class BoardLocation {
     private boolean mortgaged;
 
     /**
-     *This is the constructor for BoardLocation which loads the values for each individual property.
+     * This is the constructor for BoardLocation which loads the values for each individual property.
      *
      * @param position The position on the board of the location.
      * @param name The name of the location.
@@ -221,6 +218,7 @@ public class BoardLocation {
      * This method places a house on the location.
      *
      * @param player The player that is buying a house.
+     * @return Boolean True if successfully bought, false otherwise
      */
     public Boolean buyHouse(Player player) {
         // check if this location is maxed out with houses

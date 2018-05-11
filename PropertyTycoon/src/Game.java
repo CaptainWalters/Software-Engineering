@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.Timer;
 
 /**
- *The Game class runs an instance of the classic game of property tycoon. It is responsible for initialising
+ * The Game class runs an instance of the classic game of property tycoon. It is responsible for initialising
  * the board, players, dice and cards.
  *
  */

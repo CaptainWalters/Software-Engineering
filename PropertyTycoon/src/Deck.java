@@ -1,22 +1,29 @@
 /**
- *
- * @author Kieran(132206), Oliver(134730), Vlad (146674)
+ * The Class creates a Deck object that contains Card objects and acts as an interface for random Card selection
+ * @author 132206, 134730, 146674
  *
  */
 
 import java.io.*;
 import java.util.*;
 
-
 public class Deck {
     private Queue<Card> cardDeck;
 
+    /**
+     * Deck class constructor that instantiates new Deck object and fills using buildDeck()
+     * @param file OpportunityKnocks.csv or PotLuck.csv
+     */
     public Deck(File file){
         cardDeck = new LinkedList(); // instantiate new deck object
         buildDeck(file);
     }
 
-    void buildDeck(File file) {
+    /**
+     * Builds the Deck dynamically from a data CSV file
+     * @param file OpportunityKnocks.csv or PotLuck.csv
+     */
+    public void buildDeck(File file) {
         BufferedReader br;
         try {
             br = new BufferedReader(new FileReader(file));
@@ -35,9 +42,11 @@ public class Deck {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //return cards;
     }
 
+    /**
+     * Shuffle the Deck to reorganise order of Card objects in the Deck
+     */
     public void shuffle() {
         System.out.println();
         List<Card> list = new ArrayList(cardDeck);
@@ -45,19 +54,35 @@ public class Deck {
         cardDeck = new LinkedList<>(list);
     }
 
+    /**
+     * Returns a random Card from the top of the Deck
+     * @return Card random Card object from Deck
+     */
     public Card drawCard() {
         return cardDeck.remove();
     }
 
+    /**
+     * Adds a Card object to the bottom of the Deck
+     * @param card Card object
+     */
     public void addCard(Card card) {
         cardDeck.add(card);
     }
 
+    /**
+     * Get the number of Cards within the Deck
+     * @return int Number of Card objects in Deck
+     */
     public int getDeckSize() {
         return cardDeck.size();
     }
 
-    Card peekAtNextCard() {
+    /**
+     * View the top Card of the Deck without removing it from the Deck
+     * @return Card Next Card from that will be drawn from the Deck
+     */
+    public Card peekAtNextCard() {
         return cardDeck.peek();
     }
 
